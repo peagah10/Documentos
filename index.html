@@ -277,6 +277,33 @@
             <div id="contentContainer">
                 <!-- Seção de Anos Letivos -->
                 <div id="yearsSection">
+                    <!-- Pesquisa Global -->
+                    <div class="glass-effect rounded-2xl p-6 mb-8 border border-gray-200 dark:border-gray-700">
+                        <div class="flex flex-col lg:flex-row gap-4 items-center">
+                            <div class="flex-1 relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-search text-gray-400"></i>
+                                </div>
+                                <input type="text" id="globalSearch" placeholder="Pesquise o aluno por nome, CPF ou matrícula"
+                                    class="w-full pl-10 pr-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                            </div>
+                            <button onclick="clearGlobalSearch()" id="clearSearchBtn" 
+                                class="hidden px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200">
+                                <i class="fas fa-times mr-2"></i>
+                                Limpar
+                            </button>
+                        </div>
+                        
+                        <!-- Resultados da Pesquisa -->
+                        <div id="globalSearchResults" class="hidden mt-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Resultados da Pesquisa</h3>
+                                <span id="searchResultsCount" class="text-sm text-gray-500 dark:text-gray-400"></span>
+                            </div>
+                            <div id="searchResultsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto"></div>
+                        </div>
+                    </div>
+
                     <div class="flex justify-between items-center mb-8">
                         <div>
                             <h2 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
@@ -756,11 +783,11 @@
             }
         }
 
-        async function addStudent(classId, name, matricula) {
+        async function addStudent(classId, name, matricula, cpf = '') {
             try {
                 const { data, error } = await supabase
                     .from('students')
-                    .insert([{ class_id: classId, name: name, matricula: matricula }])
+                    .insert([{ class_id: classId, name: name, matricula: matricula, cpf: cpf }])
                     .select()
                     .single();
 
@@ -845,6 +872,143 @@
                 console.error('Erro ao deletar documento:', error);
                 throw error;
             }
+        }
+
+        // Pesquisa Global
+        async function searchGlobalStudents(searchTerm) {
+            try {
+                if (!searchTerm || searchTerm.length < 2) {
+                    document.getElementById('globalSearchResults').classList.add('hidden');
+                    document.getElementById('clearSearchBtn').classList.add('hidden');
+                    return;
+                }
+
+                document.getElementById('clearSearchBtn').classList.remove('hidden');
+                
+                const { data: allStudents, error } = await supabase
+                    .from('students')
+                    .select(`
+                        *,
+                        classes:class_id (
+                            id,
+                            name,
+                            years:year_id (
+                                id,
+                                year
+                            )
+                        )
+                    `)
+                    .or(`name.ilike.%${searchTerm}%,matricula.ilike.%${searchTerm}%,cpf.ilike.%${searchTerm}%`);
+
+                if (error) throw error;
+
+                const searchResults = document.getElementById('searchResultsList');
+                const searchCount = document.getElementById('searchResultsCount');
+                const searchSection = document.getElementById('globalSearchResults');
+
+                searchSection.classList.remove('hidden');
+                searchCount.textContent = `${allStudents.length} resultado${allStudents.length !== 1 ? 's' : ''} encontrado${allStudents.length !== 1 ? 's' : ''}`;
+
+                searchResults.innerHTML = '';
+
+                if (allStudents.length === 0) {
+                    searchResults.innerHTML = `
+                        <div class="col-span-full text-center py-8">
+                            <div class="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-3 overflow-hidden">
+                                <img src="images/alunos.png" alt="Alunos" class="w-full h-full object-cover rounded-full">
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-400">Nenhum aluno encontrado</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                allStudents.forEach(student => {
+                    const year = student.classes?.years?.year || 'N/A';
+                    const className = student.classes?.name || 'N/A';
+                    
+                    let displayName = student.name;
+                    let displayMatricula = student.matricula;
+                    let displayCpf = student.cpf || '';
+                    
+                    if (searchTerm) {
+                        const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                        displayName = displayName.replace(regex, '<span class="search-highlight">$1</span>');
+                        displayMatricula = displayMatricula.replace(regex, '<span class="search-highlight">$1</span>');
+                        if (displayCpf) {
+                            displayCpf = displayCpf.replace(regex, '<span class="search-highlight">$1</span>');
+                        }
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = 'card-hover bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-4 cursor-pointer';
+                    
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="h-10 w-10 rounded-lg bg-green-500 flex items-center justify-center overflow-hidden">
+                                <img src="images/alunos.png" alt="Aluno" class="w-full h-full object-cover rounded-lg">
+                            </div>
+                            <i class="fas fa-arrow-right text-gray-400"></i>
+                        </div>
+                        <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-1">${displayName}</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Mat: ${displayMatricula}</p>
+                        ${displayCpf ? `<p class="text-sm text-gray-600 dark:text-gray-400 mb-1">CPF: ${displayCpf}</p>` : ''}
+                        <p class="text-xs text-gray-500 dark:text-gray-500">${year} - ${className}</p>
+                    `;
+                    
+                    card.addEventListener('click', () => {
+                        selectStudentDirectly(student.id, student.name, student.class_id, student.classes.years.id);
+                    });
+                    
+                    searchResults.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error('Erro na pesquisa global:', error);
+                showNotification('Erro ao pesquisar alunos', 'error');
+            }
+        }
+
+        async function selectStudentDirectly(studentId, studentName, classId, yearId) {
+            try {
+                // Atualizar o estado atual
+                currentState.year = yearId;
+                currentState.class = classId;
+                currentState.student = studentId;
+                
+                // Limpar pesquisa
+                clearGlobalSearch();
+                
+                // Carregar dados necessários no cache
+                await getYears();
+                await getClasses(yearId);
+                await getStudents(classId);
+                
+                // Ir diretamente para os documentos
+                document.getElementById('currentStudent').textContent = studentName;
+                await loadDocuments(studentId);
+                
+                // Atualizar breadcrumb
+                const yearObj = dataCache.years.find(y => y.id === yearId);
+                const classObj = dataCache.classes.find(c => c.id === classId);
+                updateBreadcrumb(
+                    '<img src="images/anos.png" alt="Anos" class="w-5 h-5 mr-2 rounded inline"> Anos Letivos',
+                    yearObj?.year || '',
+                    '<img src="images/turmas.png" alt="Turmas" class="w-5 h-5 mr-2 rounded inline"> ' + (classObj?.name || ''),
+                    '<img src="images/alunos.png" alt="Alunos" class="w-5 h-5 mr-2 rounded inline"> ' + studentName
+                );
+                
+                showNotification(`Aluno "${studentName}" selecionado com sucesso!`);
+            } catch (error) {
+                console.error('Erro ao selecionar aluno:', error);
+                showNotification('Erro ao abrir documentos do aluno', 'error');
+            }
+        }
+
+        function clearGlobalSearch() {
+            document.getElementById('globalSearch').value = '';
+            document.getElementById('globalSearchResults').classList.add('hidden');
+            document.getElementById('clearSearchBtn').classList.add('hidden');
         }
 
         // Sistema de Filtros e Pesquisa
@@ -996,6 +1160,7 @@
                     </div>
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">${displayName}</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Matrícula: ${displayMatricula}</p>
+                    ${student.cpf ? `<p class="text-sm text-gray-600 dark:text-gray-400">CPF: ${student.cpf}</p>` : ''}
                 `;
                 
                 card.addEventListener('click', () => selectStudent(student.id, student.name));
@@ -1026,11 +1191,11 @@
         async function exportStudentsData() {
             try {
                 const students = await getStudents(currentState.class);
-                let csvContent = "Nome,Matrícula,Documentos\n";
+                let csvContent = "Nome,Matrícula,CPF,Documentos\n";
                 
                 for (const student of students) {
                     const docs = await getDocuments(student.id);
-                    csvContent += `"${student.name}","${student.matricula}","${docs.length}"\n`;
+                    csvContent += `"${student.name}","${student.matricula}","${student.cpf || ''}","${docs.length}"\n`;
                 }
                 
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -1241,6 +1406,12 @@
                                 class="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                                 placeholder="Ex: João Silva Santos">
                         </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">CPF (opcional)</label>
+                            <input type="text" id="studentCpf" maxlength="14"
+                                class="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                placeholder="Ex: 123.456.789-00">
+                        </div>
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Número da Matrícula</label>
                             <input type="text" id="studentMatricula" required
@@ -1264,6 +1435,17 @@
             showModal(content);
             
             setTimeout(() => {
+                const cpfInput = document.getElementById('studentCpf');
+                if (cpfInput) {
+                    cpfInput.addEventListener('input', function(e) {
+                        let value = e.target.value.replace(/\D/g, '');
+                        if (value.length <= 11) {
+                            value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                            e.target.value = value;
+                        }
+                    });
+                }
+                
                 const form = document.getElementById('addStudentForm');
                 if (form) {
                     form.addEventListener('submit', handleAddStudent);
@@ -1278,6 +1460,7 @@
             
             try {
                 const studentName = document.getElementById('studentName').value;
+                const studentCpf = document.getElementById('studentCpf').value;
                 const studentMatricula = document.getElementById('studentMatricula').value;
                 
                 const { data: existingStudents } = await supabase
@@ -1290,7 +1473,7 @@
                     return;
                 }
                 
-                await addStudent(currentState.class, studentName, studentMatricula);
+                await addStudent(currentState.class, studentName, studentMatricula, studentCpf);
                 const classObj = dataCache.classes.find(c => c.id === currentState.class);
                 await selectClass(currentState.class, classObj?.name);
                 await updateStats();
@@ -1991,6 +2174,18 @@
                 
                 const years = await getYears();
                 yearsList.innerHTML = '';
+                
+                // Inicializar pesquisa global
+                const globalSearchInput = document.getElementById('globalSearch');
+                if (globalSearchInput) {
+                    let searchTimeout;
+                    globalSearchInput.addEventListener('input', function(e) {
+                        clearTimeout(searchTimeout);
+                        searchTimeout = setTimeout(() => {
+                            searchGlobalStudents(e.target.value.trim());
+                        }, 300);
+                    });
+                }
                 
                 if (years.length === 0) {
                     yearsList.innerHTML = `
