@@ -114,8 +114,7 @@
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
-    <img src="images/sf1.png" alt="Fundo" class="fixed top-0 left-0 w-full h-full object-contain opacity-60 z-[-1]">
-
+    <img id="backgroundImage" src="images/semed1.png" alt="Fundo" class="fixed top-0 left-0 w-full h-full object-contain opacity-60 z-[-1]">
 
     <!-- Notifications Container -->
     <div id="notificationsContainer"></div>
@@ -124,7 +123,7 @@
     <div id="loadingScreen" class="min-h-screen flex items-center justify-center">
         <div class="text-center">
             <div class="mx-auto h-20 w-20 rounded-3xl gradient-bg flex items-center justify-center mb-6 overflow-hidden">
-                <img src="images/sf.png" alt="Logo da Escola" class="w-full h-full object-cover rounded-3xl">
+                <img id="loadingLogo" src="images/semed.png" alt="Logo da Escola" class="w-full h-full object-cover rounded-3xl">
             </div>
             <div class="loading mb-4"></div>
             <p class="text-gray-600 dark:text-gray-400 text-lg">Carregando Sistema Escolar...</p>
@@ -136,11 +135,11 @@
         <div class="max-w-md w-full">
             <div class="glass-effect rounded-3xl shadow-2xl p-8">
                 <div class="text-center">
-                    <div class="mx-auto h-20 w-20 rounded-3xl gradient-bg flex items-center justify-center mb-6 overflow-hidden">
-                        <img src="images/sf.png" alt="Logo da Escola" class="w-full h-full object-cover rounded-3xl">
+                    <div id="schoolLogo" class="mx-auto h-20 w-20 rounded-3xl gradient-bg flex items-center justify-center mb-6 overflow-hidden">
+                        <img src="images/semed.png" alt="Logo da Escola" class="w-full h-full object-cover rounded-3xl">
                     </div>
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                        EMEB Sagrada Família
+                    <h2 id="schoolName" class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                        SEMED MARAVILHA - AL 
                     </h2>
                     <p class="text-gray-600 dark:text-gray-400 mb-8">
                         Gestão Completa de Documentos Escolares
@@ -148,6 +147,25 @@
                 </div>
                 
                 <form id="loginForm" class="space-y-6">
+                    <div>
+                        <label for="schoolSelect" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Selecione a Escola
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-school text-gray-400"></i>
+                            </div>
+                            <select id="schoolSelect" required
+                                class="w-full pl-10 pr-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                                <option value="">Selecione uma escola</option>
+                                <option value="sagrada_familia">EMEB Sagrada Família</option>
+                                <option value="manoel_serafim">EMEB Manoel Serafim</option>
+                                <option value="joao_lemos">EMEB João Lemos</option>
+                                <option value="jose_rodrigues">EMEF José Rodrigues</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div>
                         <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Usuário
@@ -200,11 +218,11 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     <div class="flex items-center">
-                        <div class="h-10 w-10 rounded-xl gradient-bg flex items-center justify-center mr-3 overflow-hidden">
+                        <div id="headerLogo" class="h-10 w-10 rounded-xl gradient-bg flex items-center justify-center mr-3 overflow-hidden">
                             <img src="images/sf.png" alt="Logo da Escola" class="w-full h-full object-cover rounded-xl">
                         </div>
                         <div>
-                            <h1 class="text-xl font-bold text-gray-900 dark:text-white">
+                            <h1 id="headerSchoolName" class="text-xl font-bold text-gray-900 dark:text-white">
                                 EMEB Sagrada Família
                             </h1>
                             <p class="text-xs text-gray-500 dark:text-gray-400">Gestão de Documentos</p>
@@ -498,6 +516,7 @@
         
         // Estado atual de navegação
         let currentState = {
+            school: null,
             year: null,
             class: null,
             student: null
@@ -517,6 +536,57 @@
             sortBy: 'name',
             filterBy: 'all'
         };
+
+        // Configuração das escolas
+        const schoolsConfig = {
+            sagrada_familia: {
+                name: 'EMEB Sagrada Família',
+                logo: 'images/sf.png',
+                background: 'images/sf1.png'
+            },
+            manoel_serafim: {
+                name: 'EMEB Manoel Serafim',
+                logo: 'images/ms.png',
+                background: 'images/ms1.png'
+            },
+            joao_lemos: {
+                name: 'EMEB João Lemos',
+                logo: 'images/jl.png',
+                background: 'images/jl1.png'
+            },
+            jose_rodrigues: {
+                name: 'EMEB José Rodrigues',
+                logo: 'images/jr.png',
+                background: 'images/jr1.png'
+            }
+        };
+
+        // Atualizar interface com dados da escola
+        function updateSchoolInterface(schoolId) {
+            const school = schoolsConfig[schoolId];
+            if (!school) return;
+
+            // Atualizar logos e nomes
+            document.getElementById('schoolLogo').querySelector('img').src = school.logo;
+            document.getElementById('schoolName').textContent = school.name;
+            document.getElementById('headerLogo').querySelector('img').src = school.logo;
+            document.getElementById('headerSchoolName').textContent = school.name;
+            document.getElementById('loadingLogo').src = school.logo;
+            document.getElementById('backgroundImage').src = school.background;
+        }
+
+        // Event listener para mudança de escola
+        document.addEventListener('DOMContentLoaded', function() {
+            const schoolSelect = document.getElementById('schoolSelect');
+            if (schoolSelect) {
+                schoolSelect.addEventListener('change', function() {
+                    const selectedSchool = this.value;
+                    if (selectedSchool) {
+                        updateSchoolInterface(selectedSchool);
+                    }
+                });
+            }
+        });
 
         // Sistema de notificações
         function showNotification(message, type = 'success') {
@@ -568,19 +638,25 @@
 
         async function initializeData() {
             try {
-                const { data: users, error: usersError } = await supabase
-                    .from('users')
-                    .select('*')
-                    .limit(1);
-
-                if (usersError) throw usersError;
-
-                if (!users || users.length === 0) {
-                    const { error: insertError } = await supabase
+                // Verificar se as tabelas já têm os usuários padrão para cada escola
+                const schools = ['sagrada_familia', 'manoel_serafim', 'joao_lemos', 'jose_rodrigues'];
+                
+                for (const school of schools) {
+                    const { data: users, error: usersError } = await supabase
                         .from('users')
-                        .insert([{ username: 'admin', password: 'admin123' }]);
-                    
-                    if (insertError) throw insertError;
+                        .select('*')
+                        .eq('school_id', school)
+                        .limit(1);
+
+                    if (usersError) throw usersError;
+
+                    if (!users || users.length === 0) {
+                        const { error: insertError } = await supabase
+                            .from('users')
+                            .insert([{ username: 'admin', password: 'admin123', school_id: school }]);
+                        
+                        if (insertError) throw insertError;
+                    }
                 }
             } catch (error) {
                 console.error('Erro ao inicializar dados:', error);
@@ -589,13 +665,14 @@
         }
 
         // Autenticação
-        async function authenticateUser(username, password) {
+        async function authenticateUser(username, password, schoolId) {
             try {
                 const { data, error } = await supabase
                     .from('users')
                     .select('*')
                     .eq('username', username)
                     .eq('password', password)
+                    .eq('school_id', schoolId)
                     .single();
 
                 if (error || !data) return false;
@@ -609,10 +686,13 @@
         // Atualizar estatísticas
         async function updateStats() {
             try {
-                const { data: years } = await supabase.from('years').select('*');
-                const { data: classes } = await supabase.from('classes').select('*');
-                const { data: students } = await supabase.from('students').select('*');
-                const { data: documents } = await supabase.from('documents').select('*');
+                const schoolId = currentState.school;
+                if (!schoolId) return;
+
+                const { data: years } = await supabase.from('years').select('*').eq('school_id', schoolId);
+                const { data: classes } = await supabase.from('classes').select('*').eq('school_id', schoolId);
+                const { data: students } = await supabase.from('students').select('*').eq('school_id', schoolId);
+                const { data: documents } = await supabase.from('documents').select('*').eq('school_id', schoolId);
 
                 document.getElementById('totalYears').textContent = years?.length || 0;
                 document.getElementById('totalClasses').textContent = classes?.length || 0;
@@ -629,6 +709,7 @@
                 const { data, error } = await supabase
                     .from('years')
                     .select('*')
+                    .eq('school_id', currentState.school)
                     .order('year', { ascending: false });
 
                 if (error) throw error;
@@ -644,7 +725,7 @@
             try {
                 const { data, error } = await supabase
                     .from('years')
-                    .insert([{ year: year }])
+                    .insert([{ year: year, school_id: currentState.school }])
                     .select()
                     .single();
 
@@ -664,7 +745,8 @@
                     .in('class_id', (await supabase
                         .from('classes')
                         .select('id')
-                        .eq('year_id', yearId)).data?.map(c => c.id) || []);
+                        .eq('year_id', yearId)
+                        .eq('school_id', currentState.school)).data?.map(c => c.id) || []);
 
                 if (students && students.length > 0) {
                     await supabase
@@ -679,17 +761,20 @@
                     .in('class_id', (await supabase
                         .from('classes')
                         .select('id')
-                        .eq('year_id', yearId)).data?.map(c => c.id) || []);
+                        .eq('year_id', yearId)
+                        .eq('school_id', currentState.school)).data?.map(c => c.id) || []);
 
                 await supabase
                     .from('classes')
                     .delete()
-                    .eq('year_id', yearId);
+                    .eq('year_id', yearId)
+                    .eq('school_id', currentState.school);
 
                 const { error } = await supabase
                     .from('years')
                     .delete()
-                    .eq('id', yearId);
+                    .eq('id', yearId)
+                    .eq('school_id', currentState.school);
 
                 if (error) throw error;
                 return true;
@@ -706,6 +791,7 @@
                     .from('classes')
                     .select('*')
                     .eq('year_id', yearId)
+                    .eq('school_id', currentState.school)
                     .order('name');
 
                 if (error) throw error;
@@ -721,7 +807,7 @@
             try {
                 const { data, error } = await supabase
                     .from('classes')
-                    .insert([{ year_id: yearId, name: name }])
+                    .insert([{ year_id: yearId, name: name, school_id: currentState.school }])
                     .select()
                     .single();
 
@@ -738,7 +824,8 @@
                 const { data: students } = await supabase
                     .from('students')
                     .select('id')
-                    .eq('class_id', classId);
+                    .eq('class_id', classId)
+                    .eq('school_id', currentState.school);
 
                 if (students && students.length > 0) {
                     await supabase
@@ -750,12 +837,14 @@
                 await supabase
                     .from('students')
                     .delete()
-                    .eq('class_id', classId);
+                    .eq('class_id', classId)
+                    .eq('school_id', currentState.school);
 
                 const { error } = await supabase
                     .from('classes')
                     .delete()
-                    .eq('id', classId);
+                    .eq('id', classId)
+                    .eq('school_id', currentState.school);
 
                 if (error) throw error;
                 return true;
@@ -772,6 +861,7 @@
                     .from('students')
                     .select('*')
                     .eq('class_id', classId)
+                    .eq('school_id', currentState.school)
                     .order('name');
 
                 if (error) throw error;
@@ -787,7 +877,7 @@
             try {
                 const { data, error } = await supabase
                     .from('students')
-                    .insert([{ class_id: classId, name: name, matricula: matricula, cpf: cpf }])
+                    .insert([{ class_id: classId, name: name, matricula: matricula, cpf: cpf, school_id: currentState.school }])
                     .select()
                     .single();
 
@@ -804,12 +894,14 @@
                 await supabase
                     .from('documents')
                     .delete()
-                    .eq('student_id', studentId);
+                    .eq('student_id', studentId)
+                    .eq('school_id', currentState.school);
 
                 const { error } = await supabase
                     .from('students')
                     .delete()
-                    .eq('id', studentId);
+                    .eq('id', studentId)
+                    .eq('school_id', currentState.school);
 
                 if (error) throw error;
                 return true;
@@ -826,6 +918,7 @@
                     .from('documents')
                     .select('*')
                     .eq('student_id', studentId)
+                    .eq('school_id', currentState.school)
                     .order('date', { ascending: false });
 
                 if (error) throw error;
@@ -846,7 +939,8 @@
                         type: type, 
                         name: name, 
                         path: path,
-                        date: new Date().toISOString().split('T')[0]
+                        date: new Date().toISOString().split('T')[0],
+                        school_id: currentState.school
                     }])
                     .select()
                     .single();
@@ -864,7 +958,8 @@
                 const { error } = await supabase
                     .from('documents')
                     .delete()
-                    .eq('id', documentId);
+                    .eq('id', documentId)
+                    .eq('school_id', currentState.school);
 
                 if (error) throw error;
                 return true;
@@ -898,6 +993,7 @@
                             )
                         )
                     `)
+                    .eq('school_id', currentState.school)
                     .or(`name.ilike.%${searchTerm}%,matricula.ilike.%${searchTerm}%,cpf.ilike.%${searchTerm}%`);
 
                 if (error) throw error;
@@ -1466,7 +1562,8 @@
                 const { data: existingStudents } = await supabase
                     .from('students')
                     .select('matricula')
-                    .eq('matricula', studentMatricula);
+                    .eq('matricula', studentMatricula)
+                    .eq('school_id', currentState.school);
 
                 if (existingStudents && existingStudents.length > 0) {
                     showNotification('Esta matrícula já está cadastrada!', 'error');
@@ -2108,13 +2205,23 @@
             const submitBtn = e.target.querySelector('button[type="submit"]');
             showLoadingInButton(submitBtn, true);
             
+            const schoolId = document.getElementById('schoolSelect').value;
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
+            if (!schoolId) {
+                showNotification('Selecione uma escola primeiro!', 'error');
+                showLoadingInButton(submitBtn, false);
+                return;
+            }
+            
             try {
-                const authenticated = await authenticateUser(username, password);
+                const authenticated = await authenticateUser(username, password, schoolId);
                 
                 if (authenticated) {
+                    currentState.school = schoolId;
+                    updateSchoolInterface(schoolId);
+                    
                     document.getElementById('loginScreen').classList.add('hidden');
                     document.getElementById('mainScreen').classList.remove('hidden');
                     await loadYears();
@@ -2138,10 +2245,16 @@
         document.getElementById('logoutBtn').addEventListener('click', function() {
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('mainScreen').classList.add('hidden');
+            document.getElementById('schoolSelect').value = '';
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
             
+            currentState = { school: null, year: null, class: null, student: null };
             dataCache = { years: [], classes: [], students: [], documents: [] };
+            
+            // Resetar interface para o padrão
+            updateSchoolInterface('sagrada_familia');
+            
             showNotification('Logout realizado com sucesso!', 'info');
         });
 
@@ -2489,68 +2602,70 @@
         });
 
         // Visualizar documento
-        async function viewDocument(docId) {
-            try {
-                const document = dataCache.documents.find(d => d.id === docId);
-                if (!document) {
-                    showNotification('Documento não encontrado', 'error');
-                    return;
-                }
-                
-                let docTypeName = '';
-                switch(document.type) {
-                    case 'ata': docTypeName = 'Ata de Resultados Finais'; break;
-                    case 'ficha': docTypeName = 'Ficha Individual de Rendimento'; break;
-                    case 'boletim': docTypeName = 'Boletim Escolar'; break;
-                    case 'historico': docTypeName = 'Histórico Escolar'; break;
-                    case 'declaracao': docTypeName = 'Declaração'; break;
-                    default: docTypeName = document.name;
-                }
-                
-                let previewContent = '';
-                if (document.path.startsWith('data:application/pdf')) {
-                    previewContent = `<iframe src="${document.path}" class="w-full h-96 rounded-xl border-0"></iframe>`;
-                } else {
-                    previewContent = `<img src="${document.path}" class="max-w-full h-auto rounded-xl shadow-lg">`;
-                }
-                
-                const content = `
-                    <div class="p-8 max-w-2xl">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                                <img src="images/doc.png" alt="Documentos" class="w-6 h-6 mr-3 rounded">
-                                ${docTypeName}
-                            </h3>
-                            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-                                <i class="fas fa-times text-xl"></i>
-                            </button>
-                        </div>
-                        <div class="mb-6 text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                            ${previewContent}
-                        </div>
-                        <div class="text-center mb-6">
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Data de upload: ${formatDate(document.date)}</p>
-                        </div>
-                        <div class="flex space-x-3">
-                            <button onclick="closeModal()" 
-                                class="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
-                                Fechar
-                            </button>
-                            <a href="${document.path}" download="${docTypeName} - ${formatDate(document.date)}.${document.path.includes('pdf') ? 'pdf' : 'png'}"
-                                class="flex-1 px-6 py-3 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 text-center shadow-lg">
-                                <i class="fas fa-download mr-2"></i>
-                                Download
-                            </a>
-                        </div>
-                    </div>
-                `;
-                
-                showModal(content);
-            } catch (error) {
-                console.error('Erro ao visualizar documento:', error);
-                showNotification('Erro ao carregar documento', 'error');
-            }
+async function viewDocument(docId) {
+    try {
+        // Converter docId para número para garantir comparação correta
+        const numericDocId = parseInt(docId);
+        const document = dataCache.documents.find(d => d.id == numericDocId);
+        if (!document) {
+            showNotification('Documento não encontrado', 'error');
+            return;
         }
+        
+        let docTypeName = '';
+        switch(document.type) {
+            case 'ata': docTypeName = 'Ata de Resultados Finais'; break;
+            case 'ficha': docTypeName = 'Ficha Individual de Rendimento'; break;
+            case 'boletim': docTypeName = 'Boletim Escolar'; break;
+            case 'historico': docTypeName = 'Histórico Escolar'; break;
+            case 'declaracao': docTypeName = 'Declaração'; break;
+            default: docTypeName = document.name;
+        }
+        
+        let previewContent = '';
+        if (document.path.startsWith('data:application/pdf')) {
+            previewContent = `<iframe src="${document.path}" class="w-full h-96 rounded-xl border-0"></iframe>`;
+        } else {
+            previewContent = `<img src="${document.path}" class="max-w-full h-auto rounded-xl shadow-lg">`;
+        }
+        
+        const content = `
+            <div class="p-8 max-w-2xl">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                        <img src="images/doc.png" alt="Documentos" class="w-6 h-6 mr-3 rounded">
+                        ${docTypeName}
+                    </h3>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="mb-6 text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                    ${previewContent}
+                </div>
+                <div class="text-center mb-6">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Data de upload: ${formatDate(document.date)}</p>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="closeModal()" 
+                        class="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
+                        Fechar
+                    </button>
+                    <a href="${document.path}" download="${docTypeName} - ${formatDate(document.date)}.${document.path.includes('pdf') ? 'pdf' : 'png'}"
+                        class="flex-1 px-6 py-3 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 text-center shadow-lg">
+                        <i class="fas fa-download mr-2"></i>
+                        Download
+                    </a>
+                </div>
+            </div>
+        `;
+        
+        showModal(content);
+    } catch (error) {
+        console.error('Erro ao visualizar documento:', error);
+        showNotification('Erro ao carregar documento', 'error');
+    }
+}
 
         // Função auxiliar para formatar data
         function formatDate(dateString) {
