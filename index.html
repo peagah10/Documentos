@@ -4,9 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestão de Documentos Escolares</title>
+
+    <!-- Open Graph / WhatsApp -->
+    <meta property="og:title" content="SEMED MARAVILHA - AL">
+    <meta property="og:description" content="Organize, acesse e gerencie documentos escolares de forma simples e eficiente.">
+    <meta property="og:image" content="images/semed.png">
+    <meta property="og:url" content="https://documentos-escolares.netlify.app/">
+    <meta property="og:type" content="website">
+
+<!-- Instagram usa as mesmas tags do Open Graph -->
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <link href="https://kit.fontawesome.com/4f4f4f4f4f.css" rel="stylesheet" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" crossorigin="anonymous">
+    
+    
     <script>
         tailwind.config = {
             theme: {
@@ -111,6 +123,30 @@
         .dark .checkbox-item:hover {
             background-color: #374151;
         }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .glass-effect {
+                margin: 0.5rem;
+                padding: 1rem;
+            }
+            
+            .card-hover {
+                padding: 1rem;
+            }
+            
+            .text-3xl {
+                font-size: 1.5rem;
+            }
+            
+            .text-2xl {
+                font-size: 1.25rem;
+            }
+            
+            .grid {
+                gap: 0.75rem;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
@@ -133,15 +169,15 @@
     <!-- Tela de Login -->
     <div class="min-h-screen flex items-center justify-center px-4 py-12 hidden" id="loginScreen">
         <div class="max-w-md w-full">
-            <div class="glass-effect rounded-3xl shadow-2xl p-8">
+            <div class="glass-effect rounded-3xl shadow-2xl p-6 sm:p-8">
                 <div class="text-center">
                     <div id="schoolLogo" class="mx-auto h-20 w-20 rounded-3xl gradient-bg flex items-center justify-center mb-6 overflow-hidden">
                         <img src="images/semed.png" alt="Logo da Escola" class="w-full h-full object-cover rounded-3xl">
                     </div>
-                    <h2 id="schoolName" class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                    <h2 id="schoolName" class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
                         SEMED MARAVILHA - AL 
                     </h2>
-                    <p class="text-gray-600 dark:text-gray-400 mb-8">
+                    <p class="text-gray-600 dark:text-gray-400 mb-8 text-sm sm:text-base">
                         Gestão Completa de Documentos Escolares
                     </p>
                 </div>
@@ -189,8 +225,11 @@
                                 <i class="fas fa-lock text-gray-400"></i>
                             </div>
                             <input type="password" id="password" required
-                                class="w-full pl-10 pr-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                class="w-full pl-10 pr-12 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                                 placeholder="Digite sua senha">
+                            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <i class="fas fa-eye text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"></i>
+                            </button>
                         </div>
                     </div>
                     
@@ -222,7 +261,7 @@
                             <img src="images/sf.png" alt="Logo da Escola" class="w-full h-full object-cover rounded-xl">
                         </div>
                         <div>
-                            <h1 id="headerSchoolName" class="text-xl font-bold text-gray-900 dark:text-white">
+                            <h1 id="headerSchoolName" class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                                 EMEB Sagrada Família
                             </h1>
                             <p class="text-xs text-gray-500 dark:text-gray-400">Gestão de Documentos</p>
@@ -235,21 +274,21 @@
                             <p class="text-xs text-gray-500 dark:text-gray-400">Online</p>
                         </div>
                         <button id="logoutBtn" 
-                            class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20">
-                            <i class="fas fa-sign-out-alt mr-2"></i>
-                            Sair
+                            class="flex items-center px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20">
+                            <i class="fas fa-sign-out-alt mr-1 sm:mr-2"></i>
+                            <span class="hidden sm:inline">Sair</span>
                         </button>
                     </div>
                 </div>
             </div>
         </header>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
             <!-- Breadcrumb -->
-            <nav class="mb-8">
-                <div class="glass-effect rounded-2xl px-6 py-4">
-                    <ol id="breadcrumb" class="flex items-center space-x-2 text-sm">
-                        <li class="text-primary font-medium flex items-center">
+            <nav class="mb-6 sm:mb-8">
+                <div class="glass-effect rounded-2xl px-4 sm:px-6 py-3 sm:py-4">
+                    <ol id="breadcrumb" class="flex items-center space-x-2 text-sm overflow-x-auto">
+                        <li class="text-primary font-medium flex items-center whitespace-nowrap">
                             <img src="images/anos.png" alt="Anos" class="w-5 h-5 mr-2 rounded">
                             Anos Letivos
                         </li>
@@ -258,35 +297,35 @@
             </nav>
 
             <!-- Stats Dashboard -->
-            <div id="statsSection" class="mb-8">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-lg border border-gray-200 dark:border-gray-700">
-                        <div class="h-12 w-12 rounded-xl gradient-bg flex items-center justify-center mx-auto mb-3 overflow-hidden">
+            <div id="statsSection" class="mb-6 sm:mb-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 text-center shadow-lg border border-gray-200 dark:border-gray-700">
+                        <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl gradient-bg flex items-center justify-center mx-auto mb-2 sm:mb-3 overflow-hidden">
                             <img src="images/anos.png" alt="Anos" class="w-full h-full object-cover rounded-xl">
                         </div>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white" id="totalYears">0</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Anos Letivos</p>
+                        <p class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white" id="totalYears">0</p>
+                        <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Anos Letivos</p>
                     </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-lg border border-gray-200 dark:border-gray-700">
-                        <div class="h-12 w-12 rounded-xl bg-blue-500 flex items-center justify-center mx-auto mb-3 overflow-hidden">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 text-center shadow-lg border border-gray-200 dark:border-gray-700">
+                        <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-blue-500 flex items-center justify-center mx-auto mb-2 sm:mb-3 overflow-hidden">
                             <img src="images/turmas.png" alt="Turmas" class="w-full h-full object-cover rounded-xl">
                         </div>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white" id="totalClasses">0</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Turmas</p>
+                        <p class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white" id="totalClasses">0</p>
+                        <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Turmas</p>
                     </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-lg border border-gray-200 dark:border-gray-700">
-                        <div class="h-12 w-12 rounded-xl bg-green-500 flex items-center justify-center mx-auto mb-3 overflow-hidden">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 text-center shadow-lg border border-gray-200 dark:border-gray-700">
+                        <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-green-500 flex items-center justify-center mx-auto mb-2 sm:mb-3 overflow-hidden">
                             <img src="images/alunos.png" alt="Alunos" class="w-full h-full object-cover rounded-xl">
                         </div>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white" id="totalStudents">0</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Alunos</p>
+                        <p class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white" id="totalStudents">0</p>
+                        <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Alunos</p>
                     </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-lg border border-gray-200 dark:border-gray-700">
-                        <div class="h-12 w-12 rounded-xl bg-purple-500 flex items-center justify-center mx-auto mb-3 overflow-hidden">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 text-center shadow-lg border border-gray-200 dark:border-gray-700">
+                        <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-purple-500 flex items-center justify-center mx-auto mb-2 sm:mb-3 overflow-hidden">
                             <img src="images/doc.png" alt="Documentos" class="w-full h-full object-cover rounded-xl">
                         </div>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white" id="totalDocuments">0</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Documentos</p>
+                        <p class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white" id="totalDocuments">0</p>
+                        <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Documentos</p>
                     </div>
                 </div>
             </div>
@@ -296,17 +335,17 @@
                 <!-- Seção de Anos Letivos -->
                 <div id="yearsSection">
                     <!-- Pesquisa Global -->
-                    <div class="glass-effect rounded-2xl p-6 mb-8 border border-gray-200 dark:border-gray-700">
+                    <div class="glass-effect rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 border border-gray-200 dark:border-gray-700">
                         <div class="flex flex-col lg:flex-row gap-4 items-center">
-                            <div class="flex-1 relative">
+                            <div class="flex-1 relative w-full">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <i class="fas fa-search text-gray-400"></i>
                                 </div>
-                                <input type="text" id="globalSearch" placeholder="Pesquise o aluno por nome, CPF ou matrícula"
+                                <input type="text" id="globalSearch" placeholder="Pesquise o aluno por nome, CPF, matrícula ou data de nascimento"
                                     class="w-full pl-10 pr-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
                             </div>
                             <button onclick="clearGlobalSearch()" id="clearSearchBtn" 
-                                class="hidden px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200">
+                                class="hidden px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200 whitespace-nowrap">
                                 <i class="fas fa-times mr-2"></i>
                                 Limpar
                             </button>
@@ -322,87 +361,105 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-between items-center mb-8">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
                         <div>
-                            <h2 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
-                                <img src="images/anos.png" alt="Anos" class="w-8 h-8 mr-3 rounded">
+                            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
+                                <img src="images/anos.png" alt="Anos" class="w-6 sm:w-8 h-6 sm:h-8 mr-3 rounded">
                                 Anos Letivos
                             </h2>
-                            <p class="text-gray-600 dark:text-gray-400 mt-1">Gerencie os anos letivos da instituição</p>
+                            <p class="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base">Gerencie os anos letivos da instituição</p>
                         </div>
-                        <div class="flex space-x-3">
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
                             <button onclick="openAddYearModal()"
-                                class="flex items-center px-6 py-3 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg">
+                                class="flex items-center justify-center px-4 sm:px-6 py-3 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg">
                                 <i class="fas fa-plus mr-2"></i>
                                 Novo Ano
                             </button>
                             <button onclick="openRemoveYearModal()"
-                                class="flex items-center px-6 py-3 text-sm font-medium text-red-600 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-200 border border-red-200 dark:border-red-800">
+                                class="flex items-center justify-center px-4 sm:px-6 py-3 text-sm font-medium text-red-600 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-200 border border-red-200 dark:border-red-800">
                                 <i class="fas fa-trash mr-2"></i>
                                 Remover
                             </button>
                         </div>
                     </div>
-                    <div id="yearsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+                    <div id="yearsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"></div>
                 </div>
 
-                <!-- Seção de Turmas -->
-                <div id="classesSection" class="hidden">
-                    <div class="flex justify-between items-center mb-8">
+                <!-- Seção de Turnos -->
+                <div id="shiftsSection" class="hidden">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
                         <div>
                             <button id="backToYears" class="flex items-center text-primary hover:text-primary-dark transition-colors duration-200 mb-4 px-3 py-2 rounded-lg hover:bg-primary/10">
                                 <i class="fas fa-arrow-left mr-2"></i>
                                 Voltar para Anos Letivos
                             </button>
-                            <h2 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
-                                <img src="images/turmas.png" alt="Turmas" class="w-8 h-8 mr-3 rounded">
-                                Turmas - <span id="currentYear" class="text-primary"></span>
+                            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
+                                <img src="images/turnos.png" alt="Turnos" class="w-6 sm:w-8 h-6 sm:h-8 mr-3 rounded">
+                                Turnos - <span id="currentYearForShifts" class="text-primary"></span>
                             </h2>
-                            <p class="text-gray-600 dark:text-gray-400 mt-1">Gerencie as turmas do ano letivo</p>
+                            <p class="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base">Selecione o turno para acessar as turmas</p>
                         </div>
-                        <div class="flex space-x-3">
+                    </div>
+                    <div id="shiftsList" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6"></div>
+                </div>
+
+                <!-- Seção de Turmas -->
+                <div id="classesSection" class="hidden">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
+                        <div>
+                            <button id="backToShifts" class="flex items-center text-primary hover:text-primary-dark transition-colors duration-200 mb-4 px-3 py-2 rounded-lg hover:bg-primary/10">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Voltar para Turnos
+                            </button>
+                            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
+                                <img src="images/turmas.png" alt="Turmas" class="w-6 sm:w-8 h-6 sm:h-8 mr-3 rounded">
+                                <span id="currentShiftName" class="text-primary"></span> - <span id="currentYear" class="text-primary"></span>
+                            </h2>
+                            <p class="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base">Gerencie as turmas do turno selecionado</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
                             <button onclick="openAddClassModal()"
-                                class="flex items-center px-6 py-3 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg">
+                                class="flex items-center justify-center px-4 sm:px-6 py-3 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg">
                                 <i class="fas fa-plus mr-2"></i>
                                 Nova Turma
                             </button>
                             <button onclick="openRemoveClassModal()"
-                                class="flex items-center px-6 py-3 text-sm font-medium text-red-600 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-200 border border-red-200 dark:border-red-800">
+                                class="flex items-center justify-center px-4 sm:px-6 py-3 text-sm font-medium text-red-600 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-200 border border-red-200 dark:border-red-800">
                                 <i class="fas fa-trash mr-2"></i>
                                 Remover
                             </button>
                         </div>
                     </div>
-                    <div id="classesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+                    <div id="classesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"></div>
                 </div>
 
                 <!-- Seção de Alunos -->
                 <div id="studentsSection" class="hidden">
-                    <div class="flex justify-between items-center mb-8">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
                         <div>
                             <button id="backToClasses" class="flex items-center text-primary hover:text-primary-dark transition-colors duration-200 mb-4 px-3 py-2 rounded-lg hover:bg-primary/10">
                                 <i class="fas fa-arrow-left mr-2"></i>
                                 Voltar para Turmas
                             </button>
-                            <h2 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
-                                <img src="images/alunos.png" alt="Alunos" class="w-8 h-8 mr-3 rounded">
-                                Alunos - <span id="currentClass" class="text-primary"></span>
+                            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
+                                <img src="images/alunos.png" alt="Alunos" class="w-6 sm:w-8 h-6 sm:h-8 mr-3 rounded">
+                                <span id="currentClass" class="text-primary"></span>
                             </h2>
-                            <p class="text-gray-600 dark:text-gray-400 mt-1">Gerencie os alunos da turma</p>
+                            <p class="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base">Gerencie os alunos da turma</p>
                         </div>
-                        <div class="flex space-x-3">
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
                             <button onclick="exportStudentsData()"
-                                class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200">
-                                <i class="fas fa-download mr-2"></i>
-                                Exportar
+                                class="flex items-center justify-center px-3 sm:px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200">
+                                <i class="fas fa-download mr-1 sm:mr-2"></i>
+                                <span class="hidden sm:inline">Exportar</span>
                             </button>
                             <button onclick="openAddStudentModal()"
-                                class="flex items-center px-6 py-3 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg">
+                                class="flex items-center justify-center px-4 sm:px-6 py-3 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg">
                                 <i class="fas fa-user-plus mr-2"></i>
-                                Novo Aluno
+                                <span class="hidden sm:inline">Novo Aluno</span>
                             </button>
                             <button onclick="openRemoveStudentModal()"
-                                class="flex items-center px-6 py-3 text-sm font-medium text-red-600 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-200 border border-red-200 dark:border-red-800">
+                                class="flex items-center justify-center px-4 sm:px-6 py-3 text-sm font-medium text-red-600 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-200 border border-red-200 dark:border-red-800">
                                 <i class="fas fa-user-times mr-2"></i>
                                 Remover
                             </button>
@@ -410,22 +467,22 @@
                     </div>
 
                     <!-- Área de Pesquisa -->
-                    <div class="glass-effect rounded-2xl p-6 mb-8 border border-gray-200 dark:border-gray-700">
+                    <div class="glass-effect rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 border border-gray-200 dark:border-gray-700">
                         <div class="flex flex-col lg:flex-row gap-4 items-center">
                             <!-- Pesquisa -->
-                            <div class="flex-1 relative">
+                            <div class="flex-1 relative w-full">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <i class="fas fa-search text-gray-400"></i>
                                 </div>
-                                <input type="text" id="studentSearch" placeholder="Pesquisar por nome ou matrícula..."
+                                <input type="text" id="studentSearch" placeholder="Pesquisar por nome, matrícula ou data de nascimento..."
                                     class="w-full pl-10 pr-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
                             </div>
                             
                             <!-- Ordenação -->
-                            <div class="flex items-center space-x-3">
-                                <label class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">Ordenar por:</label>
+                            <div class="flex items-center space-x-3 w-full lg:w-auto">
+                                <label class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap hidden sm:block">Ordenar:</label>
                                 <select id="studentSort" 
-                                    class="px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                                    class="flex-1 lg:flex-none px-3 sm:px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
                                     <option value="name">Nome (A-Z)</option>
                                     <option value="name_desc">Nome (Z-A)</option>
                                     <option value="matricula">Matrícula (Crescente)</option>
@@ -456,37 +513,65 @@
                         </div>
                     </div>
 
-                    <div id="studentsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                    <div id="studentsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"></div>
+                    
+                    <!-- Seção de Documentos da Turma -->
+                    <div id="classDocumentsSection" class="mt-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                                <img src="images/doc.png" alt="Documentos" class="w-6 sm:w-8 h-6 sm:h-8 mr-3 rounded">
+                                Documentos da Turma
+                            </h3>
+                            <button onclick="openAddClassDocumentModal()"
+                                class="flex items-center justify-center px-4 sm:px-6 py-3 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg">
+                                <i class="fas fa-folder-plus mr-2"></i>
+                                Novo Documento
+                            </button>
+                        </div>
+                        <div id="classDocumentsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"></div>
+                    </div>
                 </div>
 
-                <!-- Seção de Documentos -->
+                <!-- Seção de Documentos do Aluno -->
                 <div id="documentsSection" class="hidden">
-                    <div class="flex justify-between items-center mb-8">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
                         <div>
                             <button id="backToStudents" class="flex items-center text-primary hover:text-primary-dark transition-colors duration-200 mb-4 px-3 py-2 rounded-lg hover:bg-primary/10">
                                 <i class="fas fa-arrow-left mr-2"></i>
                                 Voltar para Alunos
                             </button>
-                            <h2 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
-                                <img src="images/doc.png" alt="Documentos" class="w-8 h-8 mr-3 rounded">
-                                Documentos - <span id="currentStudent" class="text-primary"></span>
+                            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
+                                <img src="images/doc.png" alt="Documentos" class="w-6 sm:w-8 h-6 sm:h-8 mr-3 rounded">
+                                <span id="currentStudent" class="text-primary"></span>
                             </h2>
-                            <p class="text-gray-600 dark:text-gray-400 mt-1">Gerencie os documentos do aluno</p>
-                        </div>
-                        <div class="flex space-x-3">
-                            <button onclick="openAddDocumentModal()"
-                                class="flex items-center px-6 py-3 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg">
-                                <i class="fas fa-file-plus mr-2"></i>
-                                Novo Documento
-                            </button>
-                            <button onclick="openRemoveDocumentModal()"
-                                class="flex items-center px-6 py-3 text-sm font-medium text-red-600 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-200 border border-red-200 dark:border-red-800">
-                                <i class="fas fa-trash-alt mr-2"></i>
-                                Remover
-                            </button>
+                            <p class="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base">Gerencie os documentos do aluno</p>
                         </div>
                     </div>
-                    <div id="documentsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+                    <!-- Documentos do Aluno -->
+                    <div class="glass-effect rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 mb-6 sm:mb-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                                <img src="images/alunos.png" alt="Aluno" class="w-5 h-5 mr-2 rounded">
+                                Documentos do Aluno
+                            </h3>
+                            <button onclick="openAddDocumentModal()"
+                                class="px-3 py-2 text-sm font-medium text-white gradient-bg rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg">
+                                <i class="fas fa-file-plus mr-1"></i>
+                                <span class="hidden sm:inline">Novo</span>
+                            </button>
+                        </div>
+                        <div id="studentDocumentsList" class="space-y-3"></div>
+                    </div>
+
+                    <!-- Botões de ação -->
+                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                        <button onclick="openRemoveDocumentModal()"
+                            class="flex items-center justify-center px-4 sm:px-6 py-3 text-sm font-medium text-red-600 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-200 border border-red-200 dark:border-red-800">
+                            <i class="fas fa-trash-alt mr-2"></i>
+                            Remover Documentos
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -508,6 +593,40 @@
             }
         });
 
+        // Toggle password visibility
+        function initializePasswordToggle() {
+            // Usar setTimeout para garantir que o DOM esteja pronto
+            setTimeout(() => {
+                const togglePassword = document.getElementById('togglePassword');
+                const passwordInput = document.getElementById('password');
+                
+                if (togglePassword && passwordInput) {
+                    // Remover listeners existentes para evitar duplicação
+                    togglePassword.removeEventListener('click', handlePasswordToggle);
+                    togglePassword.addEventListener('click', handlePasswordToggle);
+                }
+            }, 100);
+        }
+
+        function handlePasswordToggle() {
+            const passwordInput = document.getElementById('password');
+            if (!passwordInput) return;
+            
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            const icon = this.querySelector('i');
+            if (icon) {
+                if (type === 'password') {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                } else {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                }
+            }
+        }
+
         // Configuração do Supabase
         const SUPABASE_URL = 'https://fzahylkgkqsizorvhvuf.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6YWh5bGtna3FzaXpvcnZodnVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwNzI4MDAsImV4cCI6MjA2NDY0ODgwMH0.xtqVQwHLsUmuuekDegPhVfCSiLQXOCE7wATIQqVorfY';
@@ -518,6 +637,7 @@
         let currentState = {
             school: null,
             year: null,
+            shift: null,
             class: null,
             student: null
         };
@@ -527,7 +647,8 @@
             years: [],
             classes: [],
             students: [],
-            documents: []
+            documents: [],
+            classDocuments: []
         };
 
         // Estado dos filtros
@@ -536,6 +657,61 @@
             sortBy: 'name',
             filterBy: 'all'
         };
+
+        // Função para converter data brasileira para formato ISO (sem problemas de fuso horário)
+function convertBrazilianDate(brazilianDate) {
+    if (!brazilianDate) return '';
+    
+    const parts = brazilianDate.split('/');
+    if (parts.length === 3) {
+        const day = parseInt(parts[0]);
+        const month = parseInt(parts[1]);
+        const year = parseInt(parts[2]);
+        
+        // Validar se a data é válida
+        if (year >= 1900 && year <= 2030 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+            // Criar data local e retornar no formato ISO local
+            const date = new Date(year, month - 1, day); // month - 1 porque Date usa mês base 0
+            const localYear = date.getFullYear();
+            const localMonth = String(date.getMonth() + 1).padStart(2, '0');
+            const localDay = String(date.getDate()).padStart(2, '0');
+            
+            return `${localYear}-${localMonth}-${localDay}`;
+        }
+    }
+    return '';
+}
+
+        // Função auxiliar para formatar data com segurança
+function formatDateSafe(dateString) {
+    if (!dateString) return '';
+    
+    // Se já contém HTML (highlight), extrair a data primeiro
+    const cleanDate = dateString.replace(/<[^>]*>/g, '');
+    
+    try {
+        // Se está no formato ISO (YYYY-MM-DD), tratar como data local
+        if (cleanDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            const parts = cleanDate.split('-');
+            const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            return date.toLocaleDateString('pt-BR');
+        }
+        
+        // Se já está no formato brasileiro, retornar como está
+        if (cleanDate.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+            return cleanDate;
+        }
+        
+        // Tentar como Data normal
+        const date = new Date(cleanDate);
+        if (isNaN(date.getTime())) {
+            return cleanDate; // Retorna a string original se não for uma data válida
+        }
+        return date.toLocaleDateString('pt-BR');
+    } catch (error) {
+        return cleanDate; // Retorna a string original em caso de erro
+    }
+}
 
         // Configuração das escolas
         const schoolsConfig = {
@@ -558,6 +734,25 @@
                 name: 'EMEB José Rodrigues',
                 logo: 'images/jr.png',
                 background: 'images/jr1.png'
+            }
+        };
+
+        // Turnos disponíveis com imagens reais
+        const shiftsConfig = {
+            matutino: {
+                name: 'Matutino',
+                icon: 'images/matu.png',
+                color: 'bg-yellow-500'
+            },
+            vespertino: {
+                name: 'Vespertino',
+                icon: 'images/vespe.png',
+                color: 'bg-orange-500'
+            },
+            noturno: {
+                name: 'Noturno',
+                icon: 'images/notu.png',
+                color: 'bg-purple-500'
             }
         };
 
@@ -599,7 +794,7 @@
             notification.className = `notification ${bgColor} text-white p-4 rounded-xl shadow-lg flex items-center space-x-3`;
             notification.innerHTML = `
                 <i class="fas ${icon}"></i>
-                <span>${message}</span>
+                <span class="text-sm sm:text-base">${message}</span>
                 <button onclick="this.parentElement.remove()" class="ml-auto text-white hover:text-gray-200">
                     <i class="fas fa-times"></i>
                 </button>
@@ -785,14 +980,19 @@
         }
 
         // CRUD Turmas
-        async function getClasses(yearId) {
+        async function getClasses(yearId, shift = null) {
             try {
-                const { data, error } = await supabase
+                let query = supabase
                     .from('classes')
                     .select('*')
                     .eq('year_id', yearId)
-                    .eq('school_id', currentState.school)
-                    .order('name');
+                    .eq('school_id', currentState.school);
+                
+                if (shift) {
+                    query = query.eq('shift', shift);
+                }
+                
+                const { data, error } = await query.order('name');
 
                 if (error) throw error;
                 dataCache.classes = data || [];
@@ -803,11 +1003,11 @@
             }
         }
 
-        async function addClass(yearId, name) {
+        async function addClass(yearId, name, shift) {
             try {
                 const { data, error } = await supabase
                     .from('classes')
-                    .insert([{ year_id: yearId, name: name, school_id: currentState.school }])
+                    .insert([{ year_id: yearId, name: name, shift: shift, school_id: currentState.school }])
                     .select()
                     .single();
 
@@ -836,6 +1036,13 @@
 
                 await supabase
                     .from('students')
+                    .delete()
+                    .eq('class_id', classId)
+                    .eq('school_id', currentState.school);
+
+                // Delete class documents
+                await supabase
+                    .from('class_documents')
                     .delete()
                     .eq('class_id', classId)
                     .eq('school_id', currentState.school);
@@ -873,11 +1080,18 @@
             }
         }
 
-        async function addStudent(classId, name, matricula, cpf = '') {
+        async function addStudent(classId, name, matricula, cpf = '', birthDate = '') {
             try {
                 const { data, error } = await supabase
                     .from('students')
-                    .insert([{ class_id: classId, name: name, matricula: matricula, cpf: cpf, school_id: currentState.school }])
+                    .insert([{ 
+                        class_id: classId, 
+                        name: name, 
+                        matricula: matricula, 
+                        cpf: cpf,
+                        birth_date: birthDate,
+                        school_id: currentState.school 
+                    }])
                     .select()
                     .single();
 
@@ -969,12 +1183,59 @@
             }
         }
 
-        // Pesquisa Global
+        // CRUD Documentos da Turma
+        async function getClassDocuments(classId) {
+            try {
+                const { data, error } = await supabase
+                    .from('class_documents')
+                    .select('*')
+                    .eq('class_id', classId)
+                    .eq('school_id', currentState.school)
+                    .order('date', { ascending: false });
+
+                if (error) throw error;
+                dataCache.classDocuments = data || [];
+                return data || [];
+            } catch (error) {
+                console.error('Erro ao carregar documentos da turma:', error);
+                return [];
+            }
+        }
+
+        async function addClassDocument(classId, type, name, path) {
+            try {
+                const { data, error } = await supabase
+                    .from('class_documents')
+                    .insert([{ 
+                        class_id: classId, 
+                        type: type, 
+                        name: name, 
+                        path: path,
+                        date: new Date().toISOString().split('T')[0],
+                        school_id: currentState.school
+                    }])
+                    .select()
+                    .single();
+
+                if (error) throw error;
+                return data;
+            } catch (error) {
+                console.error('Erro ao adicionar documento da turma:', error);
+                throw error;
+            }
+        }
+
+        // Pesquisa Global - CORRIGIDA
         async function searchGlobalStudents(searchTerm) {
             try {
                 if (!searchTerm || searchTerm.length < 2) {
                     document.getElementById('globalSearchResults').classList.add('hidden');
                     document.getElementById('clearSearchBtn').classList.add('hidden');
+                    return;
+                }
+
+                if (!currentState.school) {
+                    showNotification('Erro: Escola não selecionada', 'error');
                     return;
                 }
 
@@ -987,27 +1248,44 @@
                         classes:class_id (
                             id,
                             name,
+                            shift,
                             years:year_id (
                                 id,
                                 year
                             )
                         )
                     `)
-                    .eq('school_id', currentState.school)
-                    .or(`name.ilike.%${searchTerm}%,matricula.ilike.%${searchTerm}%,cpf.ilike.%${searchTerm}%`);
+                    .eq('school_id', currentState.school);
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Erro na pesquisa:', error);
+                    throw error;
+                }
+
+                // Filtrar resultados localmente para evitar problemas com campos null
+                const filteredStudents = allStudents.filter(student => {
+                    const name = (student.name || '').toLowerCase();
+                    const matricula = (student.matricula || '').toLowerCase();
+                    const cpf = (student.cpf || '').toLowerCase();
+                    const birthDate = (student.birth_date || '').toLowerCase();
+                    const searchLower = searchTerm.toLowerCase();
+                    
+                    return name.includes(searchLower) || 
+                           matricula.includes(searchLower) || 
+                           cpf.includes(searchLower) || 
+                           birthDate.includes(searchLower);
+                });
 
                 const searchResults = document.getElementById('searchResultsList');
                 const searchCount = document.getElementById('searchResultsCount');
                 const searchSection = document.getElementById('globalSearchResults');
 
                 searchSection.classList.remove('hidden');
-                searchCount.textContent = `${allStudents.length} resultado${allStudents.length !== 1 ? 's' : ''} encontrado${allStudents.length !== 1 ? 's' : ''}`;
+                searchCount.textContent = `${filteredStudents.length} resultado${filteredStudents.length !== 1 ? 's' : ''} encontrado${filteredStudents.length !== 1 ? 's' : ''}`;
 
                 searchResults.innerHTML = '';
 
-                if (allStudents.length === 0) {
+                if (filteredStudents.length === 0) {
                     searchResults.innerHTML = `
                         <div class="col-span-full text-center py-8">
                             <div class="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-3 overflow-hidden">
@@ -1019,13 +1297,15 @@
                     return;
                 }
 
-                allStudents.forEach(student => {
+                    filteredStudents.forEach(student => {
                     const year = student.classes?.years?.year || 'N/A';
                     const className = student.classes?.name || 'N/A';
+                    const shift = student.classes?.shift || '';
                     
                     let displayName = student.name;
                     let displayMatricula = student.matricula;
                     let displayCpf = student.cpf || '';
+                    let displayBirthDate = student.birth_date || '';
                     
                     if (searchTerm) {
                         const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
@@ -1033,6 +1313,9 @@
                         displayMatricula = displayMatricula.replace(regex, '<span class="search-highlight">$1</span>');
                         if (displayCpf) {
                             displayCpf = displayCpf.replace(regex, '<span class="search-highlight">$1</span>');
+                        }
+                        if (displayBirthDate) {
+                            displayBirthDate = displayBirthDate.replace(regex, '<span class="search-highlight">$1</span>');
                         }
                     }
 
@@ -1049,11 +1332,12 @@
                         <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-1">${displayName}</h4>
                         <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Mat: ${displayMatricula}</p>
                         ${displayCpf ? `<p class="text-sm text-gray-600 dark:text-gray-400 mb-1">CPF: ${displayCpf}</p>` : ''}
-                        <p class="text-xs text-gray-500 dark:text-gray-500">${year} - ${className}</p>
+                       ${displayBirthDate ? `<p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Nasc: ${formatDateSafe(displayBirthDate)}</p>` : ''}
+                        <p class="text-xs text-gray-500 dark:text-gray-500">${year} - ${shiftsConfig[shift]?.name || shift} - ${className}</p>
                     `;
                     
                     card.addEventListener('click', () => {
-                        selectStudentDirectly(student.id, student.name, student.class_id, student.classes.years.id);
+                        selectStudentDirectly(student.id, student.name, student.class_id, student.classes.years.id, student.classes.shift);
                     });
                     
                     searchResults.appendChild(card);
@@ -1065,10 +1349,11 @@
             }
         }
 
-        async function selectStudentDirectly(studentId, studentName, classId, yearId) {
+        async function selectStudentDirectly(studentId, studentName, classId, yearId, shift) {
             try {
                 // Atualizar o estado atual
                 currentState.year = yearId;
+                currentState.shift = shift;
                 currentState.class = classId;
                 currentState.student = studentId;
                 
@@ -1077,7 +1362,7 @@
                 
                 // Carregar dados necessários no cache
                 await getYears();
-                await getClasses(yearId);
+                await getClasses(yearId, shift);
                 await getStudents(classId);
                 
                 // Ir diretamente para os documentos
@@ -1087,9 +1372,12 @@
                 // Atualizar breadcrumb
                 const yearObj = dataCache.years.find(y => y.id === yearId);
                 const classObj = dataCache.classes.find(c => c.id === classId);
+                const shiftName = shiftsConfig[shift]?.name || shift;
                 updateBreadcrumb(
                     '<img src="images/anos.png" alt="Anos" class="w-5 h-5 mr-2 rounded inline"> Anos Letivos',
                     yearObj?.year || '',
+                    '<img src="images/turnos.png" alt="Turnos" class="w-5 h-5 mr-2 rounded inline"> Turnos',
+                    shiftName,
                     '<img src="images/turmas.png" alt="Turmas" class="w-5 h-5 mr-2 rounded inline"> ' + (classObj?.name || ''),
                     '<img src="images/alunos.png" alt="Alunos" class="w-5 h-5 mr-2 rounded inline"> ' + studentName
                 );
@@ -1151,7 +1439,8 @@
             if (filterState.searchTerm) {
                 filteredStudents = filteredStudents.filter(student => 
                     student.name.toLowerCase().includes(filterState.searchTerm) ||
-                    student.matricula.toLowerCase().includes(filterState.searchTerm)
+                    student.matricula.toLowerCase().includes(filterState.searchTerm) ||
+                    (student.birth_date && student.birth_date.toLowerCase().includes(filterState.searchTerm))
                 );
             }
 
@@ -1230,20 +1519,24 @@
 
             students.forEach((student, index) => {
                 const card = document.createElement('div');
-                card.className = 'card-hover bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 cursor-pointer';
+                card.className = 'card-hover bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6 cursor-pointer';
                 
                 let displayName = student.name;
                 let displayMatricula = student.matricula;
+                let displayBirthDate = student.birth_date;
                 
                 if (filterState.searchTerm) {
                     const regex = new RegExp(`(${filterState.searchTerm})`, 'gi');
                     displayName = displayName.replace(regex, '<span class="search-highlight">$1</span>');
                     displayMatricula = displayMatricula.replace(regex, '<span class="search-highlight">$1</span>');
+                    if (displayBirthDate) {
+                        displayBirthDate = displayBirthDate.replace(regex, '<span class="search-highlight">$1</span>');
+                    }
                 }
 
                 card.innerHTML = `
                     <div class="flex items-center justify-between mb-4">
-                        <div class="h-12 w-12 rounded-xl bg-green-500 flex items-center justify-center overflow-hidden">
+                        <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-green-500 flex items-center justify-center overflow-hidden">
                             <img src="images/alunos.png" alt="Aluno" class="w-full h-full object-cover rounded-xl">
                         </div>
                         <div class="flex items-center space-x-2">
@@ -1254,8 +1547,9 @@
                             <i class="fas fa-chevron-right text-gray-400"></i>
                         </div>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">${displayName}</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Matrícula: ${displayMatricula}</p>
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">${displayName}</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Matrícula: ${displayMatricula}</p>
+                    ${student.birth_date ? `<p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Nascimento: ${formatDate(displayBirthDate)}</p>` : ''}
                     ${student.cpf ? `<p class="text-sm text-gray-600 dark:text-gray-400">CPF: ${student.cpf}</p>` : ''}
                 `;
                 
@@ -1283,31 +1577,88 @@
             applyStudentFilters();
         }
 
-        // Exportar dados dos alunos
-        async function exportStudentsData() {
-            try {
-                const students = await getStudents(currentState.class);
-                let csvContent = "Nome,Matrícula,CPF,Documentos\n";
-                
-                for (const student of students) {
-                    const docs = await getDocuments(student.id);
-                    csvContent += `"${student.name}","${student.matricula}","${student.cpf || ''}","${docs.length}"\n`;
+        // Exportar dados dos alunos - VERSÃO MELHORADA
+async function exportStudentsData() {
+    try {
+        const students = await getStudents(currentState.class);
+        
+        // Obter informações da turma para o nome do arquivo
+        const classObj = dataCache.classes.find(c => c.id === currentState.class);
+        const yearObj = dataCache.years.find(y => y.id === currentState.year);
+        const shiftName = shiftsConfig[currentState.shift]?.name || currentState.shift;
+        
+        // Cabeçalho do CSV com separação adequada
+        let csvContent = "Nome Completo;Matrícula;CPF;Data de Nascimento;Quantidade de Documentos;Tipos de Documentos\n";
+        
+        for (const student of students) {
+            const docs = await getDocuments(student.id);
+            
+            // Formatar data de nascimento
+            const birthDate = student.birth_date ? formatDate(student.birth_date) : 'Não informado';
+            
+            // Formatar CPF
+            const cpf = student.cpf || 'Não informado';
+            
+            // Listar tipos de documentos
+            const docTypes = docs.map(doc => {
+                switch(doc.type) {
+                    case 'ata': return 'Ata de Resultados';
+                    case 'ficha': return 'Ficha Individual';
+                    case 'boletim': return 'Boletim Escolar';
+                    case 'historico': return 'Histórico Escolar';
+                    case 'declaracao': return 'Declaração';
+                    default: return doc.name;
                 }
-                
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                
-                const classObj = dataCache.classes.find(c => c.id === currentState.class);
-                link.download = `alunos_${classObj?.name || 'turma'}.csv`;
-                link.click();
-                
-                showNotification('Dados exportados com sucesso!');
-            } catch (error) {
-                console.error('Erro ao exportar dados:', error);
-                showNotification('Erro ao exportar dados', 'error');
-            }
+            }).join(', ') || 'Nenhum documento';
+            
+            // Escapar aspas duplas nos dados e envolver campos com vírgula em aspas
+            const escapeCsvField = (field) => {
+                if (field.includes(';') || field.includes('"') || field.includes('\n')) {
+                    return '"' + field.replace(/"/g, '""') + '"';
+                }
+                return field;
+            };
+            
+            csvContent += `${escapeCsvField(student.name)};${escapeCsvField(student.matricula)};${escapeCsvField(cpf)};${escapeCsvField(birthDate)};${docs.length};${escapeCsvField(docTypes)}\n`;
         }
+        
+        // Adicionar informações da turma no início do arquivo
+        const header = `Relatório de Alunos\nEscola: ${schoolsConfig[currentState.school]?.name || 'Escola'}\nAno Letivo: ${yearObj?.year || 'N/A'}\nTurno: ${shiftName}\nTurma: ${classObj?.name || 'N/A'}\nData de Exportação: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}\nTotal de Alunos: ${students.length}\n\n`;
+        
+        const finalContent = header + csvContent;
+        
+        // Criar blob com encoding UTF-8 com BOM para Excel reconhecer acentos
+        const BOM = '\uFEFF';
+        const blob = new Blob([BOM + finalContent], { type: 'text/csv;charset=utf-8;' });
+        
+        // Criar link para download
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        
+        // Nome do arquivo mais descritivo
+        const fileName = `Alunos_${yearObj?.year || 'Ano'}_${shiftName}_${classObj?.name || 'Turma'}_${new Date().toISOString().split('T')[0]}.csv`;
+        link.download = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+        
+        // Fazer download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Limpar URL do objeto
+        URL.revokeObjectURL(link.href);
+        
+        showNotification(`Dados de ${students.length} aluno(s) exportados com sucesso!`);
+        
+        // Exibir instruções para o usuário
+        setTimeout(() => {
+            showNotification('Dica: Abra o arquivo no Excel e use "Dados > Texto para Colunas" com separador ";" se necessário', 'info');
+        }, 2000);
+        
+    } catch (error) {
+        console.error('Erro ao exportar dados:', error);
+        showNotification('Erro ao exportar dados: ' + error.message, 'error');
+    }
+}
 
         // Sistema de modais
         function showModal(content) {
@@ -1345,10 +1696,10 @@
         // Modais de adicionar
         function openAddYearModal() {
             const content = `
-                <div class="p-8">
+                <div class="p-6 sm:p-8">
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                            <img src="images/anos.png" alt="Anos" class="w-6 h-6 mr-3 rounded">
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                            <img src="images/anos.png" alt="Anos" class="w-5 sm:w-6 h-5 sm:h-6 mr-3 rounded">
                             Adicionar Ano Letivo
                         </h3>
                         <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -1362,7 +1713,7 @@
                                 class="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                                 placeholder="Ex: 2024">
                         </div>
-                        <div class="flex space-x-3">
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                             <button type="button" onclick="closeModal()" 
                                 class="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
                                 Cancelar
@@ -1415,10 +1766,10 @@
 
         function openAddClassModal() {
             const content = `
-                <div class="p-8">
+                <div class="p-6 sm:p-8">
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                            <img src="images/turmas.png" alt="Turmas" class="w-6 h-6 mr-3 rounded">
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                            <img src="images/turmas.png" alt="Turmas" class="w-5 sm:w-6 h-5 sm:h-6 mr-3 rounded">
                             Adicionar Turma
                         </h3>
                         <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -1426,12 +1777,22 @@
                         </button>
                     </div>
                     <form id="addClassForm">
-                        <div class="mb-6">
+                        <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nome da Turma</label>
                             <input type="text" id="className" placeholder="Ex: 6º Ano A" required
                                 class="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
                         </div>
-                        <div class="flex space-x-3">
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Turno</label>
+                            <select id="classShift" required
+                                class="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                                <option value="">Selecione o turno</option>
+                                <option value="matutino">Matutino</option>
+                                <option value="vespertino">Vespertino</option>
+                                <option value="noturno">Noturno</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                             <button type="button" onclick="closeModal()" 
                                 class="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
                                 Cancelar
@@ -1462,16 +1823,17 @@
             
             try {
                 const className = document.getElementById('className').value;
+                const classShift = document.getElementById('classShift').value;
                 
-                const existingClass = dataCache.classes.find(c => c.name === className);
+                const existingClass = dataCache.classes.find(c => c.name === className && c.shift === classShift);
                 if (existingClass) {
-                    showNotification('Esta turma já existe para este ano letivo!', 'error');
+                    showNotification('Esta turma já existe para este turno!', 'error');
                     return;
                 }
                 
-                await addClass(currentState.year, className);
+                await addClass(currentState.year, className, classShift);
                 const yearObj = dataCache.years.find(y => y.id === currentState.year);
-                await selectYear(currentState.year, yearObj?.year);
+                await selectShift(currentState.shift, currentState.year, yearObj?.year);
                 await updateStats();
                 closeModal();
                 showNotification('Turma adicionada com sucesso!');
@@ -1485,10 +1847,10 @@
 
         function openAddStudentModal() {
             const content = `
-                <div class="p-8">
+                <div class="p-6 sm:p-8">
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                            <img src="images/alunos.png" alt="Alunos" class="w-6 h-6 mr-3 rounded">
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                            <img src="images/alunos.png" alt="Alunos" class="w-5 sm:w-6 h-5 sm:h-6 mr-3 rounded">
                             Adicionar Aluno
                         </h3>
                         <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -1503,6 +1865,12 @@
                                 placeholder="Ex: João Silva Santos">
                         </div>
                         <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Data de Nascimento</label>
+                            <input type="text" id="studentBirthDate" required maxlength="10"
+                                class="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                placeholder="dd/mm/aaaa">
+                        </div>
+                        <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">CPF (opcional)</label>
                             <input type="text" id="studentCpf" maxlength="14"
                                 class="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
@@ -1514,7 +1882,7 @@
                                 class="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                                 placeholder="Ex: 2024001">
                         </div>
-                        <div class="flex space-x-3">
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                             <button type="button" onclick="closeModal()" 
                                 class="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
                                 Cancelar
@@ -1542,6 +1910,17 @@
                     });
                 }
                 
+                const birthDateInput = document.getElementById('studentBirthDate');
+                if (birthDateInput) {
+                    birthDateInput.addEventListener('input', function(e) {
+                        let value = e.target.value.replace(/\D/g, '');
+                        if (value.length <= 8) {
+                            value = value.replace(/(\d{2})(\d{2})(\d{4})/, '$1/$2/$3');
+                            e.target.value = value;
+                        }
+                    });
+                }
+                
                 const form = document.getElementById('addStudentForm');
                 if (form) {
                     form.addEventListener('submit', handleAddStudent);
@@ -1556,6 +1935,7 @@
             
             try {
                 const studentName = document.getElementById('studentName').value;
+                const studentBirthDate = convertBrazilianDate(document.getElementById('studentBirthDate').value);
                 const studentCpf = document.getElementById('studentCpf').value;
                 const studentMatricula = document.getElementById('studentMatricula').value;
                 
@@ -1570,9 +1950,9 @@
                     return;
                 }
                 
-                await addStudent(currentState.class, studentName, studentMatricula, studentCpf);
+                await addStudent(currentState.class, studentName, studentMatricula, studentCpf, studentBirthDate);
                 const classObj = dataCache.classes.find(c => c.id === currentState.class);
-                await selectClass(currentState.class, classObj?.name);
+                await selectClass(currentState.class, classObj?.name, currentState.shift);
                 await updateStats();
                 closeModal();
                 showNotification('Aluno adicionado com sucesso!');
@@ -1586,11 +1966,11 @@
 
         function openAddDocumentModal() {
             const content = `
-                <div class="p-8">
+                <div class="p-6 sm:p-8">
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                            <img src="images/doc.png" alt="Documentos" class="w-6 h-6 mr-3 rounded">
-                            Adicionar Documento
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                            <img src="images/doc.png" alt="Documentos" class="w-5 sm:w-6 h-5 sm:h-6 mr-3 rounded">
+                            Adicionar Documento do Aluno
                         </h3>
                         <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
                             <i class="fas fa-times text-xl"></i>
@@ -1622,7 +2002,7 @@
                                 class="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                                 placeholder="Ex: Certidão de Nascimento">
                         </div>
-                        <div class="flex space-x-3">
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                             <button type="button" onclick="closeModal()" 
                                 class="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
                                 Cancelar
@@ -1717,7 +2097,126 @@
             }
         }
 
-        // Modais de remoção (IMPLEMENTADOS)
+        function openAddClassDocumentModal() {
+            const classDocumentTypes = [
+                { value: 'diario', name: 'Diário de Classe' },
+                { value: 'plano_ensino', name: 'Plano de Ensino da Turma' },
+                { value: 'calendario', name: 'Calendário de Atividades da Turma' },
+                { value: 'ficha_ocorrencias', name: 'Ficha de Ocorrências Disciplinares da Turma' },
+                { value: 'ata_resultados', name: 'Ata de Resultados Finais' },
+                { value: 'ata_conselho', name: 'Ata de Reunião de Conselho de Classe' },
+                { value: 'relatorio_descritivo', name: 'Relatório Descritivo Coletivo' },
+                { value: 'ata_recuperacao', name: 'Ata de Recuperação Paralela/Final' }
+            ];
+
+            const content = `
+                <div class="p-6 sm:p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                            <img src="images/turmas.png" alt="Turma" class="w-5 sm:w-6 h-5 sm:h-6 mr-3 rounded">
+                            Adicionar Documento da Turma
+                        </h3>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <form id="addClassDocumentForm">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tipo de Documento</label>
+                            <select id="classDocumentType" required
+                                class="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                                <option value="">Selecione o tipo</option>
+                                ${classDocumentTypes.map(type => `<option value="${type.value}">${type.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Arquivo (PDF, JPG, PNG)</label>
+                            <input type="file" id="classDocumentFile" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required
+                                class="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Tamanho máximo: 10MB</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                            <button type="button" onclick="closeModal()" 
+                                class="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
+                                Cancelar
+                            </button>
+                            <button type="submit" 
+                                class="flex-1 px-6 py-3 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg">
+                                Adicionar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            showModal(content);
+            
+            setTimeout(() => {
+                const form = document.getElementById('addClassDocumentForm');
+                if (form) {
+                    form.addEventListener('submit', handleAddClassDocument);
+                }
+            }, 100);
+        }
+
+        async function handleAddClassDocument(e) {
+            e.preventDefault();
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            showLoadingInButton(submitBtn, true);
+            
+            try {
+                const documentType = document.getElementById('classDocumentType').value;
+                const documentFile = document.getElementById('classDocumentFile').files[0];
+                
+                if (!documentFile) {
+                    showNotification('Por favor, selecione um arquivo', 'error');
+                    return;
+                }
+
+                if (documentFile.size > 10 * 1024 * 1024) {
+                    showNotification('Arquivo muito grande. Tamanho máximo: 10MB', 'error');
+                    return;
+                }
+                
+                const classDocumentTypes = {
+                    'diario': 'Diário de Classe',
+                    'plano_ensino': 'Plano de Ensino da Turma',
+                    'calendario': 'Calendário de Atividades da Turma',
+                    'ficha_ocorrencias': 'Ficha de Ocorrências Disciplinares da Turma',
+                    'ata_resultados': 'Ata de Resultados Finais',
+                    'ata_conselho': 'Ata de Reunião de Conselho de Classe',
+                    'relatorio_descritivo': 'Relatório Descritivo Coletivo',
+                    'ata_recuperacao': 'Ata de Recuperação Paralela/Final'
+                };
+                
+                const documentName = classDocumentTypes[documentType];
+                
+                const reader = new FileReader();
+                reader.onload = async function(event) {
+                    try {
+                        const documentPath = event.target.result;
+                        await addClassDocument(currentState.class, documentType, documentName, documentPath);
+                        await loadClassDocuments();
+                        await updateStats();
+                        closeModal();
+                        showNotification('Documento da turma adicionado com sucesso!');
+                    } catch (error) {
+                        console.error('Erro ao salvar documento da turma:', error);
+                        showNotification('Erro ao salvar documento da turma: ' + error.message, 'error');
+                    } finally {
+                        showLoadingInButton(submitBtn, false);
+                    }
+                };
+                
+                reader.readAsDataURL(documentFile);
+            } catch (error) {
+                console.error('Erro ao adicionar documento da turma:', error);
+                showNotification('Erro ao adicionar documento da turma: ' + error.message, 'error');
+                showLoadingInButton(submitBtn, false);
+            }
+        }
+
+        // Modais de remoção (mantidos igual)
         async function openRemoveYearModal() {
             try {
                 const years = await getYears();
@@ -1744,10 +2243,10 @@
                 }
 
                 const content = `
-                    <div class="p-8">
+                    <div class="p-6 sm:p-8">
                         <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                                <img src="images/anos.png" alt="Anos" class="w-6 h-6 mr-3 rounded">
+                            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                                <img src="images/anos.png" alt="Anos" class="w-5 sm:w-6 h-5 sm:h-6 mr-3 rounded">
                                 Remover Anos Letivos
                             </h3>
                             <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -1770,7 +2269,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex space-x-3">
+                            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                                 <button type="button" onclick="closeModal()" 
                                     class="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
                                     Cancelar
@@ -1831,13 +2330,13 @@
         }
 
         async function openRemoveClassModal() {
-            if (!currentState.year) {
-                showNotification('Selecione um ano letivo primeiro', 'error');
+            if (!currentState.year || !currentState.shift) {
+                showNotification('Selecione um turno primeiro', 'error');
                 return;
             }
 
             try {
-                const classes = await getClasses(currentState.year);
+                const classes = await getClasses(currentState.year, currentState.shift);
                 
                 if (classes.length === 0) {
                     showNotification('Não há turmas para remover', 'info');
@@ -1861,10 +2360,10 @@
                 }
 
                 const content = `
-                    <div class="p-8">
+                    <div class="p-6 sm:p-8">
                         <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                                <img src="images/turmas.png" alt="Turmas" class="w-6 h-6 mr-3 rounded">
+                            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                                <img src="images/turmas.png" alt="Turmas" class="w-5 sm:w-6 h-5 sm:h-6 mr-3 rounded">
                                 Remover Turmas
                             </h3>
                             <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -1887,7 +2386,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex space-x-3">
+                            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                                 <button type="button" onclick="closeModal()" 
                                     class="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
                                     Cancelar
@@ -1936,7 +2435,7 @@
                 }
                 
                 const yearObj = dataCache.years.find(y => y.id === currentState.year);
-                await selectYear(currentState.year, yearObj?.year);
+                await selectShift(currentState.shift, currentState.year, yearObj?.year);
                 await updateStats();
                 closeModal();
                 showNotification(`${classIds.length} turma${classIds.length !== 1 ? 's' : ''} removida${classIds.length !== 1 ? 's' : ''} com sucesso!`);
@@ -1982,10 +2481,10 @@
                 }
 
                 const content = `
-                    <div class="p-8">
+                    <div class="p-6 sm:p-8">
                         <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                                <img src="images/alunos.png" alt="Alunos" class="w-6 h-6 mr-3 rounded">
+                            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                                <img src="images/alunos.png" alt="Alunos" class="w-5 sm:w-6 h-5 sm:h-6 mr-3 rounded">
                                 Remover Alunos
                             </h3>
                             <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -2008,7 +2507,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex space-x-3">
+                            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                                 <button type="button" onclick="closeModal()" 
                                     class="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
                                     Cancelar
@@ -2057,7 +2556,7 @@
                 }
                 
                 const classObj = dataCache.classes.find(c => c.id === currentState.class);
-                await selectClass(currentState.class, classObj?.name);
+                await selectClass(currentState.class, classObj?.name, currentState.shift);
                 await updateStats();
                 closeModal();
                 showNotification(`${studentIds.length} aluno${studentIds.length !== 1 ? 's' : ''} removido${studentIds.length !== 1 ? 's' : ''} com sucesso!`);
@@ -2111,10 +2610,10 @@
                 });
 
                 const content = `
-                    <div class="p-8">
+                    <div class="p-6 sm:p-8">
                         <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                                <img src="images/doc.png" alt="Documentos" class="w-6 h-6 mr-3 rounded">
+                            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                                <img src="images/doc.png" alt="Documentos" class="w-5 sm:w-6 h-5 sm:h-6 mr-3 rounded">
                                 Remover Documentos
                             </h3>
                             <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -2137,7 +2636,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex space-x-3">
+                            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                                 <button type="button" onclick="closeModal()" 
                                     class="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
                                     Cancelar
@@ -2249,8 +2748,8 @@
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
             
-            currentState = { school: null, year: null, class: null, student: null };
-            dataCache = { years: [], classes: [], students: [], documents: [] };
+            currentState = { school: null, year: null, shift: null, class: null, student: null };
+            dataCache = { years: [], classes: [], students: [], documents: [], classDocuments: [] };
             
             // Resetar interface para o padrão
             updateSchoolInterface('sagrada_familia');
@@ -2261,18 +2760,28 @@
         // Criar card genérico
         function createCard(title, subtitle, icon, onClick, options = {}) {
             const card = document.createElement('div');
-            card.className = 'card-hover bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 cursor-pointer border border-gray-200 dark:border-gray-700';
+            card.className = 'card-hover bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 cursor-pointer border border-gray-200 dark:border-gray-700';
             
             const iconBg = options.iconBg || 'gradient-bg';
+            const iconClass = options.iconClass || '';
+            
+            let iconContent = '';
+            if (iconClass) {
+                iconContent = `<i class="${iconClass} text-white text-lg sm:text-xl"></i>`;
+            } else if (icon && icon.startsWith('http')) {
+                iconContent = `<img src="${icon}" alt="Ícone" class="w-full h-full object-cover rounded-xl">`;
+            } else if (icon) {
+                iconContent = `<img src="${icon}" alt="Ícone" class="w-full h-full object-cover rounded-xl">`;
+            }
             
             card.innerHTML = `
                 <div class="flex items-center justify-between mb-4">
-                    <div class="h-12 w-12 rounded-xl ${iconBg} flex items-center justify-center overflow-hidden">
-                        <img src="${icon}" alt="Ícone" class="w-full h-full object-cover rounded-xl">
+                    <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl ${iconBg} flex items-center justify-center overflow-hidden">
+                        ${iconContent}
                     </div>
                     <i class="fas fa-chevron-right text-gray-400"></i>
                 </div>
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">${title}</h3>
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">${title}</h3>
                 <p class="text-gray-600 dark:text-gray-400 text-sm">${subtitle}</p>
             `;
             card.addEventListener('click', onClick);
@@ -2287,6 +2796,7 @@
                 
                 const years = await getYears();
                 yearsList.innerHTML = '';
+
                 
                 // Inicializar pesquisa global
                 const globalSearchInput = document.getElementById('globalSearch');
@@ -2337,24 +2847,86 @@
             }
         }
 
-        // Selecionar um Ano Letivo
+        // Selecionar um Ano Letivo (agora vai para turnos)
         async function selectYear(yearId, yearNumber) {
             currentState.year = yearId;
+            currentState.shift = null;
             currentState.class = null;
             currentState.student = null;
             
-            document.getElementById('currentYear').textContent = yearNumber;
-            await loadClasses(yearId);
+            document.getElementById('currentYearForShifts').textContent = yearNumber;
+            await loadShifts();
             updateBreadcrumb('<img src="images/anos.png" alt="Anos" class="w-5 h-5 mr-2 rounded inline"> Anos Letivos', yearNumber);
         }
 
+        // Carregar Turnos
+        async function loadShifts() {
+            try {
+                const shiftsList = document.getElementById('shiftsList');
+                shiftsList.innerHTML = '<div class="col-span-full text-center py-8"><div class="loading mx-auto mb-4"></div><p class="text-gray-600 dark:text-gray-400">Carregando turnos...</p></div>';
+                
+                // Get all classes for this year and group by shift
+                const allClasses = await getClasses(currentState.year);
+                const shiftCounts = {};
+                
+                allClasses.forEach(cls => {
+                    if (!shiftCounts[cls.shift]) {
+                        shiftCounts[cls.shift] = 0;
+                    }
+                    shiftCounts[cls.shift]++;
+                });
+                
+                shiftsList.innerHTML = '';
+                
+                // Create cards for each shift
+                Object.keys(shiftsConfig).forEach(shiftKey => {
+                    const shift = shiftsConfig[shiftKey];
+                    const classCount = shiftCounts[shiftKey] || 0;
+                    
+                    const card = createCard(
+                        shift.name,
+                        `${classCount} turma(s)`,
+                        shift.icon,
+                        () => selectShift(shiftKey, currentState.year, document.getElementById('currentYearForShifts').textContent),
+                        { 
+                            iconBg: shift.color
+                        }
+                    );
+                    shiftsList.appendChild(card);
+                });
+                
+                showSection('shiftsSection');
+            } catch (error) {
+                console.error('Erro ao carregar turnos:', error);
+                showNotification('Erro ao carregar turnos', 'error');
+            }
+        }
+
+        // Selecionar um Turno
+        async function selectShift(shift, yearId, yearNumber) {
+            currentState.shift = shift;
+            currentState.class = null;
+            currentState.student = null;
+            
+            document.getElementById('currentShiftName').textContent = shiftsConfig[shift]?.name || shift;
+            document.getElementById('currentYear').textContent = yearNumber;
+            await loadClasses(yearId, shift);
+            
+            updateBreadcrumb(
+                '<img src="images/anos.png" alt="Anos" class="w-5 h-5 mr-2 rounded inline"> Anos Letivos', 
+                yearNumber,
+                '<img src="images/turnos.png" alt="Turnos" class="w-5 h-5 mr-2 rounded inline"> Turnos',
+                shiftsConfig[shift]?.name || shift
+            );
+        }
+
         // Carregar Turmas
-        async function loadClasses(yearId) {
+        async function loadClasses(yearId, shift) {
             try {
                 const classesList = document.getElementById('classesList');
                 classesList.innerHTML = '<div class="col-span-full text-center py-8"><div class="loading mx-auto mb-4"></div><p class="text-gray-600 dark:text-gray-400">Carregando turmas...</p></div>';
                 
-                const classes = await getClasses(yearId);
+                const classes = await getClasses(yearId, shift);
                 classesList.innerHTML = '';
                 
                 if (classes.length === 0) {
@@ -2367,22 +2939,20 @@
                             <p class="text-gray-500 dark:text-gray-500 text-sm">Clique em "Nova Turma" para adicionar a primeira turma</p>
                         </div>
                     `;
-                    showSection('classesSection');
-                    return;
-                }
-                
-                for (const cls of classes) {
-                    const students = await getStudents(cls.id);
-                    const studentCount = students.length;
-                    
-                    const card = createCard(
-                        cls.name,
-                        `${studentCount} aluno(s)`,
-                        'images/turmas.png',
-                        () => selectClass(cls.id, cls.name),
-                        { iconBg: 'bg-blue-500' }
-                    );
-                    classesList.appendChild(card);
+                } else {
+                    for (const cls of classes) {
+                        const students = await getStudents(cls.id);
+                        const studentCount = students.length;
+                        
+                        const card = createCard(
+                            cls.name,
+                            `${studentCount} aluno(s)`,
+                            'images/turmas.png',
+                            () => selectClass(cls.id, cls.name, shift),
+                            { iconBg: 'bg-blue-500' }
+                        );
+                        classesList.appendChild(card);
+                    }
                 }
                 
                 showSection('classesSection');
@@ -2392,8 +2962,60 @@
             }
         }
 
+        // Carregar documentos da turma
+        async function loadClassDocuments() {
+            try {
+                if (!currentState.class) return;
+                
+                const classDocumentsList = document.getElementById('classDocumentsList');
+                if (!classDocumentsList) return;
+                
+                classDocumentsList.innerHTML = '<div class="col-span-full text-center py-8"><div class="loading mx-auto mb-4"></div><p class="text-gray-600 dark:text-gray-400">Carregando documentos...</p></div>';
+                
+                const classDocuments = await getClassDocuments(currentState.class);
+                classDocumentsList.innerHTML = '';
+                
+                if (classDocuments.length === 0) {
+                    classDocumentsList.innerHTML = `
+                        <div class="col-span-full text-center py-12">
+                            <div class="h-16 w-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4 overflow-hidden">
+                                <img src="images/doc.png" alt="Documentos" class="w-full h-full object-cover rounded-full">
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-400 text-lg mb-2">Nenhum documento da turma encontrado</p>
+                            <p class="text-gray-500 dark:text-gray-500 text-sm">Clique em "Novo Documento" para adicionar o primeiro documento</p>
+                        </div>
+                    `;
+                } else {
+                    classDocuments.forEach(doc => {
+                        const card = createCard(
+                            doc.name,
+                            `Adicionado em ${formatDate(doc.date)}`,
+                            'images/doc.png',
+                            () => viewClassDocument(doc.id),
+                            { iconBg: 'bg-purple-500' }
+                        );
+                        
+                        // Adicionar botão "Ver" no card
+                        const viewBtn = document.createElement('button');
+                        viewBtn.className = 'absolute top-2 right-2 bg-primary text-white p-2 rounded-lg hover:opacity-90 transition-opacity';
+                        viewBtn.innerHTML = '<i class="fas fa-eye"></i>';
+                        viewBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            viewClassDocument(doc.id);
+                        };
+                        
+                        card.style.position = 'relative';
+                        card.appendChild(viewBtn);
+                        classDocumentsList.appendChild(card);
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar documentos da turma:', error);
+            }
+        }
+
         // Selecionar uma Turma
-        async function selectClass(classId, className) {
+        async function selectClass(classId, className, shift) {
             currentState.class = classId;
             currentState.student = null;
             
@@ -2401,7 +3023,14 @@
             await loadStudents(classId);
             
             const yearObj = dataCache.years.find(y => y.id === currentState.year);
-            updateBreadcrumb('<img src="images/anos.png" alt="Anos" class="w-5 h-5 mr-2 rounded inline"> Anos Letivos', yearObj?.year || '', '<img src="images/turmas.png" alt="Turmas" class="w-5 h-5 mr-2 rounded inline"> ' + className);
+            const shiftName = shiftsConfig[shift]?.name || shift;
+            updateBreadcrumb(
+                '<img src="images/anos.png" alt="Anos" class="w-5 h-5 mr-2 rounded inline"> Anos Letivos', 
+                yearObj?.year || '', 
+                '<img src="images/turnos.png" alt="Turnos" class="w-5 h-5 mr-2 rounded inline"> Turnos',
+                shiftName,
+                '<img src="images/turmas.png" alt="Turmas" class="w-5 h-5 mr-2 rounded inline"> ' + className
+            );
         }
 
         // Carregar Alunos
@@ -2431,6 +3060,8 @@
                     await applyStudentFilters();
                 }
                 
+                // Carregar documentos da turma quando carregar alunos
+                await loadClassDocuments();
                 showSection('studentsSection');
             } catch (error) {
                 console.error('Erro ao carregar alunos:', error);
@@ -2447,87 +3078,73 @@
             
             const yearObj = dataCache.years.find(y => y.id === currentState.year);
             const classObj = dataCache.classes.find(c => c.id === currentState.class);
-            updateBreadcrumb('<img src="images/anos.png" alt="Anos" class="w-5 h-5 mr-2 rounded inline"> Anos Letivos', yearObj?.year || '', '<img src="images/turmas.png" alt="Turmas" class="w-5 h-5 mr-2 rounded inline"> ' + (classObj?.name || ''), '<img src="images/alunos.png" alt="Alunos" class="w-5 h-5 mr-2 rounded inline"> ' + studentName);
+            const shiftName = shiftsConfig[currentState.shift]?.name || currentState.shift;
+            updateBreadcrumb(
+                '<img src="images/anos.png" alt="Anos" class="w-5 h-5 mr-2 rounded inline"> Anos Letivos', 
+                yearObj?.year || '', 
+                '<img src="images/turnos.png" alt="Turnos" class="w-5 h-5 mr-2 rounded inline"> Turnos',
+                shiftName,
+                '<img src="images/turmas.png" alt="Turmas" class="w-5 h-5 mr-2 rounded inline"> ' + (classObj?.name || ''), 
+                '<img src="images/alunos.png" alt="Alunos" class="w-5 h-5 mr-2 rounded inline"> ' + studentName
+            );
         }
 
         // Carregar Documentos
         async function loadDocuments(studentId) {
             try {
-                const documentsList = document.getElementById('documentsList');
-                documentsList.innerHTML = '<div class="col-span-full text-center py-8"><div class="loading mx-auto mb-4"></div><p class="text-gray-600 dark:text-gray-400">Carregando documentos...</p></div>';
+                const studentDocumentsList = document.getElementById('studentDocumentsList');
                 
+                studentDocumentsList.innerHTML = '<div class="text-center py-4"><div class="loading mx-auto mb-2"></div><p class="text-gray-600 dark:text-gray-400 text-sm">Carregando...</p></div>';
+                
+                // Load student documents
                 const documents = await getDocuments(studentId);
-                documentsList.innerHTML = '';
+                studentDocumentsList.innerHTML = '';
                 
                 if (documents.length === 0) {
-                    documentsList.innerHTML = `
-                        <div class="col-span-full text-center py-12">
-                            <div class="h-16 w-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4 overflow-hidden">
+                    studentDocumentsList.innerHTML = `
+                        <div class="text-center py-8">
+                            <div class="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-3 overflow-hidden">
                                 <img src="images/doc.png" alt="Documentos" class="w-full h-full object-cover rounded-full">
                             </div>
-                            <p class="text-gray-600 dark:text-gray-400 text-lg mb-2">Nenhum documento encontrado</p>
-                            <p class="text-gray-500 dark:text-gray-500 text-sm">Clique em "Novo Documento" para adicionar o primeiro documento</p>
+                            <p class="text-gray-600 dark:text-gray-400 text-sm">Nenhum documento encontrado</p>
                         </div>
                     `;
-                    showSection('documentsSection');
-                    return;
-                }
-                
-                documents.forEach((doc) => {
-                    let docTypeName = '';
-                    let iconUrl = 'images/doc.png';
-                    let iconBg = 'bg-purple-500';
-                    
-                    switch(doc.type) {
-                        case 'ata': 
-                            docTypeName = 'Ata de Resultados Finais';
-                            iconUrl = 'images/doc.png';
-                            iconBg = 'bg-red-500';
-                            break;
-                        case 'ficha': 
-                            docTypeName = 'Ficha Individual de Rendimento';
-                            iconUrl = 'images/doc.png';
-                            iconBg = 'bg-blue-500';
-                            break;
-                        case 'boletim': 
-                            docTypeName = 'Boletim Escolar';
-                            iconUrl = 'images/doc.png';
-                            iconBg = 'bg-green-500';
-                            break;
-                        case 'historico': 
-                            docTypeName = 'Histórico Escolar';
-                            iconUrl = 'images/doc.png';
-                            iconBg = 'bg-orange-500';
-                            break;
-                        case 'declaracao': 
-                            docTypeName = 'Declaração';
-                            iconUrl = 'images/doc.png';
-                            iconBg = 'bg-teal-500';
-                            break;
-                        default: 
-                            docTypeName = doc.name;
-                    }
-                    
-                    const card = document.createElement('div');
-                    card.className = 'card-hover bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6';
-                    card.innerHTML = `
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="h-12 w-12 rounded-xl ${iconBg} flex items-center justify-center overflow-hidden">
-                                <img src="${iconUrl}" alt="Documento" class="w-full h-full object-cover rounded-xl">
-                            </div>
-                            <div class="flex space-x-2">
-                                <button onclick="viewDocument('${doc.id}')" 
-                                    class="px-3 py-2 text-sm font-medium text-primary hover:text-primary-dark transition-colors duration-200 hover:bg-primary/10 rounded-lg">
+                } else {
+                    documents.forEach((doc) => {
+                        let docTypeName = '';
+                        let iconBg = 'bg-purple-500';
+                        
+                        switch(doc.type) {
+                            case 'ata': docTypeName = 'Ata de Resultados Finais'; iconBg = 'bg-red-500'; break;
+                            case 'ficha': docTypeName = 'Ficha Individual de Rendimento'; iconBg = 'bg-blue-500'; break;
+                            case 'boletim': docTypeName = 'Boletim Escolar'; iconBg = 'bg-green-500'; break;
+                            case 'historico': docTypeName = 'Histórico Escolar'; iconBg = 'bg-orange-500'; break;
+                            case 'declaracao': docTypeName = 'Declaração'; iconBg = 'bg-teal-500'; break;
+                            default: docTypeName = doc.name;
+                        }
+                        
+                        const docCard = document.createElement('div');
+                        docCard.className = 'bg-gray-50 dark:bg-gray-700 rounded-xl p-4 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200';
+                        docCard.innerHTML = `
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="h-8 w-8 rounded-lg ${iconBg} flex items-center justify-center mr-3 overflow-hidden">
+                                        <img src="images/doc.png" alt="Documento" class="w-full h-full object-cover rounded-lg">
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-medium text-gray-900 dark:text-white">${docTypeName}</h4>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">${formatDate(doc.date)}</p>
+                                    </div>
+                                </div>
+                                <button onclick="viewDocument('${doc.id}')" class="flex items-center px-3 py-1 text-xs font-medium text-white bg-primary rounded-lg hover:opacity-90 transition-opacity">
                                     <i class="fas fa-eye mr-1"></i>
                                     Ver
                                 </button>
                             </div>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">${docTypeName}</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Data: ${formatDate(doc.date)}</p>
-                    `;
-                    documentsList.appendChild(card);
-                });
+                        `;
+                        studentDocumentsList.appendChild(docCard);
+                    });
+                }
                 
                 showSection('documentsSection');
             } catch (error) {
@@ -2538,7 +3155,7 @@
 
         // Mostrar seção específica
         function showSection(sectionId) {
-            const sections = ['yearsSection', 'classesSection', 'studentsSection', 'documentsSection'];
+            const sections = ['yearsSection', 'shiftsSection', 'classesSection', 'studentsSection', 'documentsSection'];
             sections.forEach(id => {
                 const section = document.getElementById(id);
                 if (id === sectionId) {
@@ -2560,123 +3177,246 @@
                 if (index < items.length - 1) {
                     li.innerHTML = `
                         <button onclick="navigateToBreadcrumb(${index})" 
-                            class="text-gray-600 dark:text-gray-400 hover:text-primary transition-colors duration-200 px-2 py-1 rounded-md hover:bg-primary/10 flex items-center">
+                            class="text-gray-600 dark:text-gray-400 hover:text-primary transition-colors duration-200 px-2 py-1 rounded-md hover:bg-primary/10 flex items-center text-sm">
                             ${item}
                         </button>
                         <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
                     `;
                 } else {
-                    li.innerHTML = `<span class="text-primary font-medium px-2 py-1 bg-primary/10 rounded-md flex items-center">${item}</span>`;
+                    li.innerHTML = `<span class="text-primary font-medium px-2 py-1 bg-primary/10 rounded-md flex items-center text-sm">${item}</span>`;
                 }
                 
                 breadcrumb.appendChild(li);
             });
         }
 
-        // Navegar pelo breadcrumb
-        async function navigateToBreadcrumb(level) {
+        // Navegar pelo breadcrumb - OTIMIZADO
+        function navigateToBreadcrumb(level) {
+            // Navegação rápida sem await desnecessário
             switch(level) {
                 case 0:
-                    await loadYears();
+                    // Resetar estados
+                    currentState.year = null;
+                    currentState.shift = null;
+                    currentState.class = null;
+                    currentState.student = null;
+                    loadYears();
                     break;
                 case 1:
+                    // Voltar para turnos
+                    currentState.shift = null;
+                    currentState.class = null;
+                    currentState.student = null;
                     const yearObj = dataCache.years.find(y => y.id === currentState.year);
-                    await selectYear(currentState.year, yearObj?.year);
+                    if (yearObj) {
+                        selectYear(currentState.year, yearObj.year);
+                    }
                     break;
                 case 2:
+                    // Voltar para turmas
+                    currentState.class = null;
+                    currentState.student = null;
+                    const yearForShifts = document.getElementById('currentYearForShifts')?.textContent;
+                    if (currentState.shift && currentState.year && yearForShifts) {
+                        selectShift(currentState.shift, currentState.year, yearForShifts);
+                    }
+                    break;
+                case 3:
+                    // Voltar para alunos
+                    currentState.student = null;
                     const classObj = dataCache.classes.find(c => c.id === currentState.class);
-                    await selectClass(currentState.class, classObj?.name);
+                    if (classObj && currentState.shift) {
+                        selectClass(currentState.class, classObj.name, currentState.shift);
+                    }
                     break;
             }
         }
 
-        // Botões de voltar
-        document.getElementById('backToYears').addEventListener('click', () => loadYears());
-        document.getElementById('backToClasses').addEventListener('click', async () => {
-            const yearObj = dataCache.years.find(y => y.id === currentState.year);
-            await selectYear(currentState.year, yearObj?.year);
+        // Botões de voltar otimizados
+        document.getElementById('backToYears').addEventListener('click', () => {
+            currentState.year = null;
+            currentState.shift = null;
+            currentState.class = null;
+            currentState.student = null;
+            loadYears();
         });
-        document.getElementById('backToStudents').addEventListener('click', async () => {
+        
+        document.getElementById('backToShifts').addEventListener('click', () => {
+            currentState.shift = null;
+            currentState.class = null;
+            currentState.student = null;
+            const yearObj = dataCache.years.find(y => y.id === currentState.year);
+            if (yearObj) {
+                selectYear(currentState.year, yearObj.year);
+            }
+        });
+        
+        document.getElementById('backToClasses').addEventListener('click', () => {
+            currentState.class = null;
+            currentState.student = null;
+            const yearForClasses = document.getElementById('currentYear')?.textContent;
+            if (currentState.shift && currentState.year && yearForClasses) {
+                selectShift(currentState.shift, currentState.year, yearForClasses);
+            }
+        });
+        
+        document.getElementById('backToStudents').addEventListener('click', () => {
+            currentState.student = null;
             const classObj = dataCache.classes.find(c => c.id === currentState.class);
-            await selectClass(currentState.class, classObj?.name);
+            if (classObj && currentState.shift) {
+                selectClass(currentState.class, classObj.name, currentState.shift);
+            }
         });
 
         // Visualizar documento
-async function viewDocument(docId) {
-    try {
-        // Converter docId para número para garantir comparação correta
-        const numericDocId = parseInt(docId);
-        const document = dataCache.documents.find(d => d.id == numericDocId);
-        if (!document) {
-            showNotification('Documento não encontrado', 'error');
-            return;
+        async function viewDocument(docId) {
+            try {
+                const numericDocId = parseInt(docId);
+                const document = dataCache.documents.find(d => d.id == numericDocId);
+                if (!document) {
+                    showNotification('Documento não encontrado', 'error');
+                    return;
+                }
+                
+                let docTypeName = '';
+                switch(document.type) {
+                    case 'ata': docTypeName = 'Ata de Resultados Finais'; break;
+                    case 'ficha': docTypeName = 'Ficha Individual de Rendimento'; break;
+                    case 'boletim': docTypeName = 'Boletim Escolar'; break;
+                    case 'historico': docTypeName = 'Histórico Escolar'; break;
+                    case 'declaracao': docTypeName = 'Declaração'; break;
+                    default: docTypeName = document.name;
+                }
+                
+                let previewContent = '';
+                if (document.path.startsWith('data:application/pdf')) {
+                    previewContent = `<iframe src="${document.path}" class="w-full h-96 rounded-xl border-0"></iframe>`;
+                } else {
+                    previewContent = `<img src="${document.path}" class="max-w-full h-auto rounded-xl shadow-lg">`;
+                }
+                
+                const content = `
+                    <div class="p-6 sm:p-8 max-w-2xl">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                                <img src="images/doc.png" alt="Documentos" class="w-5 sm:w-6 h-5 sm:h-6 mr-3 rounded">
+                                ${docTypeName}
+                            </h3>
+                            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="mb-6 text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                            ${previewContent}
+                        </div>
+                        <div class="text-center mb-6">
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Data de upload: ${formatDate(document.date)}</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                            <button onclick="closeModal()" 
+                                class="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
+                                Fechar
+                            </button>
+                            <a href="${document.path}" download="${docTypeName} - ${formatDate(document.date)}.${document.path.includes('pdf') ? 'pdf' : 'png'}"
+                                class="flex-1 px-6 py-3 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 text-center shadow-lg">
+                                <i class="fas fa-download mr-2"></i>
+                                Download
+                            </a>
+                        </div>
+                    </div>
+                `;
+                
+                showModal(content);
+            } catch (error) {
+                console.error('Erro ao visualizar documento:', error);
+                showNotification('Erro ao carregar documento', 'error');
+            }
         }
-        
-        let docTypeName = '';
-        switch(document.type) {
-            case 'ata': docTypeName = 'Ata de Resultados Finais'; break;
-            case 'ficha': docTypeName = 'Ficha Individual de Rendimento'; break;
-            case 'boletim': docTypeName = 'Boletim Escolar'; break;
-            case 'historico': docTypeName = 'Histórico Escolar'; break;
-            case 'declaracao': docTypeName = 'Declaração'; break;
-            default: docTypeName = document.name;
+
+        // Visualizar documento da turma
+        async function viewClassDocument(docId) {
+            try {
+                const numericDocId = parseInt(docId);
+                const document = dataCache.classDocuments.find(d => d.id == numericDocId);
+                if (!document) {
+                    showNotification('Documento não encontrado', 'error');
+                    return;
+                }
+                
+                let previewContent = '';
+                if (document.path.startsWith('data:application/pdf')) {
+                    previewContent = `<iframe src="${document.path}" class="w-full h-96 rounded-xl border-0"></iframe>`;
+                } else {
+                    previewContent = `<img src="${document.path}" class="max-w-full h-auto rounded-xl shadow-lg">`;
+                }
+                
+                const content = `
+                    <div class="p-6 sm:p-8 max-w-2xl">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                                <img src="images/turmas.png" alt="Turma" class="w-5 sm:w-6 h-5 sm:h-6 mr-3 rounded">
+                                ${document.name}
+                            </h3>
+                            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="mb-6 text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                            ${previewContent}
+                        </div>
+                        <div class="text-center mb-6">
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Data de upload: ${formatDate(document.date)}</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                            <button onclick="closeModal()" 
+                                class="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
+                                Fechar
+                            </button>
+                            <a href="${document.path}" download="${document.name} - ${formatDate(document.date)}.${document.path.includes('pdf') ? 'pdf' : 'png'}"
+                                class="flex-1 px-6 py-3 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 text-center shadow-lg">
+                                <i class="fas fa-download mr-2"></i>
+                                Download
+                            </a>
+                        </div>
+                    </div>
+                `;
+                
+                showModal(content);
+            } catch (error) {
+                console.error('Erro ao visualizar documento da turma:', error);
+                showNotification('Erro ao carregar documento', 'error');
+            }
         }
-        
-        let previewContent = '';
-        if (document.path.startsWith('data:application/pdf')) {
-            previewContent = `<iframe src="${document.path}" class="w-full h-96 rounded-xl border-0"></iframe>`;
-        } else {
-            previewContent = `<img src="${document.path}" class="max-w-full h-auto rounded-xl shadow-lg">`;
-        }
-        
-        const content = `
-            <div class="p-8 max-w-2xl">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                        <img src="images/doc.png" alt="Documentos" class="w-6 h-6 mr-3 rounded">
-                        ${docTypeName}
-                    </h3>
-                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-                <div class="mb-6 text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                    ${previewContent}
-                </div>
-                <div class="text-center mb-6">
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Data de upload: ${formatDate(document.date)}</p>
-                </div>
-                <div class="flex space-x-3">
-                    <button onclick="closeModal()" 
-                        class="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
-                        Fechar
-                    </button>
-                    <a href="${document.path}" download="${docTypeName} - ${formatDate(document.date)}.${document.path.includes('pdf') ? 'pdf' : 'png'}"
-                        class="flex-1 px-6 py-3 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 text-center shadow-lg">
-                        <i class="fas fa-download mr-2"></i>
-                        Download
-                    </a>
-                </div>
-            </div>
-        `;
-        
-        showModal(content);
-    } catch (error) {
-        console.error('Erro ao visualizar documento:', error);
-        showNotification('Erro ao carregar documento', 'error');
-    }
-}
 
         // Função auxiliar para formatar data
-        function formatDate(dateString) {
-            const date = new Date(dateString);
+function formatDate(dateString) {
+    if (!dateString) return '';
+    
+    try {
+        // Se está no formato ISO (YYYY-MM-DD), tratar como data local
+        if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            const parts = dateString.split('-');
+            const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
             return date.toLocaleDateString('pt-BR');
         }
+        
+        // Tentar como Data normal
+        const date = new Date(dateString);
+        return date.toLocaleDateString('pt-BR');
+    } catch (error) {
+        return dateString;
+    }
+}
 
         // Inicializar o sistema
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM carregado, inicializando sistema...');
             initializeSystem();
+            
+            // Inicializar toggle da senha quando mostrar a tela de login
+            setTimeout(() => {
+                initializePasswordToggle();
+            }, 1000);
         });
     </script>
 </body>
