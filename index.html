@@ -241,17 +241,6 @@
                         <span class="text-red-700 dark:text-red-400 text-sm">Usuário ou senha incorretos!</span>
                     </div>
                 </div>
-                
-                <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-                    <div class="flex items-start">
-                        <i class="fas fa-info-circle text-blue-500 mr-2 mt-0.5"></i>
-                        <div class="text-sm text-blue-700 dark:text-blue-400">
-                            <p class="font-medium">Credenciais de acesso:</p>
-                            <p>Usuário: <strong>admin</strong></p>
-                            <p>Senha: <strong>admin123</strong></p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -276,9 +265,13 @@
                     
                     <div class="flex items-center space-x-4">
                         <div class="hidden sm:block text-right">
-                            <p class="text-sm font-medium text-gray-900 dark:text-white">Administrador</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Online</p>
+                            <p id="headerUserName" class="text-sm font-medium text-gray-900 dark:text-white">Administrador</p>
+                            <p id="headerUserRole" class="text-xs text-gray-500 dark:text-gray-400">Administrador</p>
                         </div>
+                        <button id="manageUsersBtn" class="flex items-center px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 rounded-lg hover:bg-primary/10">
+                            <i class="fas fa-users-cog mr-1 sm:mr-2"></i>
+                            <span class="hidden sm:inline">Usuários</span>
+                        </button>
                         <button id="logoutBtn" 
                             class="flex items-center px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20">
                             <i class="fas fa-sign-out-alt mr-1 sm:mr-2"></i>
@@ -673,7 +666,9 @@
                         id: LocalDB.generateId(),
                         username: 'admin',
                         password: 'admin123',
-                        school_id: school
+                        school_id: school,
+                        role: 'admin',
+                        name: 'Administrador'
                     });
                 });
                 LocalDB.setData('school_users', users);
@@ -686,7 +681,8 @@
             year: null,
             shift: null,
             class: null,
-            student: null
+            student: null,
+            user: null
         };
         
         // Cache de dados
@@ -811,6 +807,7 @@
                     }
                 });
             }
+            initializePasswordToggle();
         });
 
         // Sistema de notificações
@@ -866,10 +863,10 @@
                     u.school_id === schoolId
                 );
                 
-                return !!user;
+                return user || null;
             } catch (error) {
                 console.error('Erro na autenticação:', error);
-                return false;
+                return null;
             }
         }
 
@@ -2596,6 +2593,173 @@
             }
         }
 
+        // Gerenciamento de Usuários
+        function openManageUsersModal() {
+            if (!currentState.user || currentState.user.role !== 'admin') {
+                showNotification('Acesso negado. Apenas administradores podem gerenciar usuários.', 'error');
+                return;
+            }
+
+            const users = LocalDB.getUsers().filter(u => u.school_id === currentState.school);
+            
+            let usersListHtml = '';
+            users.forEach(user => {
+                const roleNames = {
+                    'admin': 'Administrador',
+                    'secretario': 'Secretário(a)',
+                    'diretor': 'Diretor(a)',
+                    'coordenador': 'Coordenador(a)',
+                    'professor': 'Professor(a)'
+                };
+                usersListHtml += `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg mb-2">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">${user.name || user.username}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">${user.username} • ${roleNames[user.role] || user.role}</p>
+                        </div>
+                        <button onclick="deleteUser('${user.id}')" class="text-red-500 hover:text-red-700 p-2">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+
+            const content = `
+                <div class="p-6 sm:p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                            <i class="fas fa-users-cog text-primary mr-3"></i>
+                            Gerenciar Usuários
+                        </h3>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Usuários cadastrados</h4>
+                        <div class="max-h-40 overflow-y-auto">
+                            ${usersListHtml || '<p class="text-sm text-gray-500">Nenhum usuário cadastrado.</p>'}
+                        </div>
+                    </div>
+
+                    <form id="addUserForm">
+                        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Adicionar novo usuário</h4>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nome completo</label>
+                            <input type="text" id="newUserName" required
+                                class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                placeholder="Nome do usuário">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Usuário (login)</label>
+                            <input type="text" id="newUserUsername" required
+                                class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                placeholder="Nome de usuário">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Senha</label>
+                            <input type="password" id="newUserPassword" required
+                                class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                placeholder="Senha">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cargo</label>
+                            <select id="newUserRole" required
+                                class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                                <option value="">Selecione o cargo</option>
+                                <option value="secretario">Secretário(a)</option>
+                                <option value="diretor">Diretor(a)</option>
+                                <option value="coordenador">Coordenador(a)</option>
+                                <option value="professor">Professor(a)</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                            <button type="button" onclick="closeModal()" 
+                                class="flex-1 px-6 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
+                                Cancelar
+                            </button>
+                            <button type="submit" 
+                                class="flex-1 px-6 py-2 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg">
+                                Adicionar Usuário
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            showModal(content);
+            
+            setTimeout(() => {
+                const form = document.getElementById('addUserForm');
+                if (form) {
+                    form.addEventListener('submit', handleAddUser);
+                }
+            }, 100);
+        }
+
+        async function handleAddUser(e) {
+            e.preventDefault();
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            showLoadingInButton(submitBtn, true);
+            
+            try {
+                const name = document.getElementById('newUserName').value;
+                const username = document.getElementById('newUserUsername').value;
+                const password = document.getElementById('newUserPassword').value;
+                const role = document.getElementById('newUserRole').value;
+                
+                // Verificar se username já existe para a escola
+                const users = LocalDB.getUsers();
+                const existingUser = users.find(u => u.username === username && u.school_id === currentState.school);
+                if (existingUser) {
+                    showNotification('Este nome de usuário já existe para esta escola!', 'error');
+                    return;
+                }
+                
+                const newUser = {
+                    id: LocalDB.generateId(),
+                    name: name,
+                    username: username,
+                    password: password,
+                    school_id: currentState.school,
+                    role: role
+                };
+                
+                users.push(newUser);
+                LocalDB.setData('school_users', users);
+                
+                closeModal();
+                showNotification(`Usuário ${name} criado com sucesso como ${role}!`);
+                
+                // Atualizar modal se ainda aberto
+                if (document.getElementById('modalContainer').classList.contains('hidden') === false) {
+                    openManageUsersModal();
+                }
+            } catch (error) {
+                console.error('Erro ao criar usuário:', error);
+                showNotification('Erro ao criar usuário: ' + error.message, 'error');
+            } finally {
+                showLoadingInButton(submitBtn, false);
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (!confirm('Tem certeza que deseja remover este usuário?')) return;
+            
+            try {
+                let users = LocalDB.getUsers();
+                users = users.filter(u => u.id !== userId);
+                LocalDB.setData('school_users', users);
+                
+                showNotification('Usuário removido com sucesso!');
+                openManageUsersModal();
+            } catch (error) {
+                console.error('Erro ao remover usuário:', error);
+                showNotification('Erro ao remover usuário: ' + error.message, 'error');
+            }
+        }
+
         // Login
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -2614,11 +2778,15 @@
             }
             
             try {
-                const authenticated = await authenticateUser(username, password, schoolId);
+                const user = await authenticateUser(username, password, schoolId);
                 
-                if (authenticated) {
+                if (user) {
                     currentState.school = schoolId;
+                    currentState.user = user;
                     updateSchoolInterface(schoolId);
+                    
+                    document.getElementById('headerUserName').textContent = user.name || user.username;
+                    document.getElementById('headerUserRole').textContent = getRoleName(user.role);
                     
                     document.getElementById('loginScreen').classList.add('hidden');
                     document.getElementById('mainScreen').classList.remove('hidden');
@@ -2639,6 +2807,17 @@
             }
         });
 
+        function getRoleName(role) {
+            const roleNames = {
+                'admin': 'Administrador',
+                'secretario': 'Secretário(a)',
+                'diretor': 'Diretor(a)',
+                'coordenador': 'Coordenador(a)',
+                'professor': 'Professor(a)'
+            };
+            return roleNames[role] || role;
+        }
+
         // Logout
         document.getElementById('logoutBtn').addEventListener('click', function() {
             document.getElementById('loginScreen').classList.remove('hidden');
@@ -2647,13 +2826,16 @@
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
             
-            currentState = { school: null, year: null, shift: null, class: null, student: null };
+            currentState = { school: null, year: null, shift: null, class: null, student: null, user: null };
             dataCache = { years: [], classes: [], students: [], documents: [], classDocuments: [] };
             
             updateSchoolInterface('sagrada_familia');
             
             showNotification('Logout realizado com sucesso!', 'info');
         });
+
+        // Gerenciamento de usuários - botão
+        document.getElementById('manageUsersBtn').addEventListener('click', openManageUsersModal);
 
         // Criar card genérico
         function createCard(title, subtitle, icon, onClick, options = {}) {
@@ -3103,83 +3285,72 @@
             }
         }
 
-        // Funções de navegação
-        function showSection(sectionId) {
-            const sections = ['yearsSection', 'shiftsSection', 'classesSection', 'studentsSection', 'documentsSection'];
-            sections.forEach(id => {
-                document.getElementById(id).classList.add('hidden');
-            });
-            document.getElementById(sectionId).classList.remove('hidden');
-        }
-
+        // Breadcrumb e navegação
         function updateBreadcrumb(...items) {
             const breadcrumb = document.getElementById('breadcrumb');
             breadcrumb.innerHTML = '';
             
             items.forEach((item, index) => {
                 const li = document.createElement('li');
+                li.className = 'flex items-center whitespace-nowrap';
                 
-                if (index === items.length - 1) {
-                    li.className = 'text-primary font-medium flex items-center whitespace-nowrap';
-                    li.innerHTML = item;
+                if (index < items.length - 1) {
+                    li.innerHTML = `<span class="text-gray-500 dark:text-gray-400">${item}</span>`;
+                    const separator = document.createElement('span');
+                    separator.className = 'mx-2 text-gray-400 dark:text-gray-500';
+                    separator.innerHTML = '<i class="fas fa-chevron-right text-xs"></i>';
+                    li.appendChild(separator);
                 } else {
-                    li.className = 'flex items-center whitespace-nowrap';
-                    li.innerHTML = `${item} <span class="mx-2 text-gray-400">></span>`;
+                    li.innerHTML = `<span class="text-primary font-medium">${item}</span>`;
                 }
                 
                 breadcrumb.appendChild(li);
             });
         }
 
-        // Inicializar eventos de navegação
-        document.addEventListener('DOMContentLoaded', function() {
-            initializePasswordToggle();
-            initializeSystem();
-        });
+        function showSection(sectionId) {
+            const sections = ['yearsSection', 'shiftsSection', 'classesSection', 'studentsSection', 'documentsSection'];
+            sections.forEach(id => {
+                const section = document.getElementById(id);
+                if (section) {
+                    section.classList.add('hidden');
+                }
+            });
+            
+            const target = document.getElementById(sectionId);
+            if (target) {
+                target.classList.remove('hidden');
+            }
+        }
 
         // Event listeners para botões de voltar
-        document.getElementById('backToYears').addEventListener('click', async function() {
-            currentState.year = null;
-            currentState.shift = null;
-            currentState.class = null;
-            currentState.student = null;
+        document.getElementById('backToYears').addEventListener('click', async () => {
             await loadYears();
-            updateBreadcrumb('<img src="images/anos.png" alt="Anos" class="w-5 h-5 mr-2 rounded inline"> Anos Letivos');
         });
 
-        document.getElementById('backToShifts').addEventListener('click', async function() {
-            currentState.class = null;
-            currentState.student = null;
-            const yearObj = dataCache.years.find(y => y.id === currentState.year);
-            document.getElementById('currentYearForShifts').textContent = yearObj?.year || '';
-            await loadShifts();
-            updateBreadcrumb(
-                '<img src="images/anos.png" alt="Anos" class="w-5 h-5 mr-2 rounded inline"> Anos Letivos',
-                yearObj?.year || ''
-            );
+        document.getElementById('backToShifts').addEventListener('click', async () => {
+            if (currentState.year) {
+                await loadShifts();
+            }
         });
 
-        document.getElementById('backToClasses').addEventListener('click', async function() {
-            currentState.student = null;
-            const yearObj = dataCache.years.find(y => y.id === currentState.year);
-            const shiftName = shiftsConfig[currentState.shift]?.name || currentState.shift;
-            document.getElementById('currentShiftName').textContent = shiftName;
-            document.getElementById('currentYear').textContent = yearObj?.year || '';
-            await loadClasses(currentState.year, currentState.shift);
-            updateBreadcrumb(
-                '<img src="images/anos.png" alt="Anos" class="w-5 h-5 mr-2 rounded inline"> Anos Letivos', 
-                yearObj?.year || '',
-                '<img src="images/turnos.png" alt="Turnos" class="w-5 h-5 mr-2 rounded inline"> Turnos',
-                shiftName
-            );
+        document.getElementById('backToClasses').addEventListener('click', async () => {
+            if (currentState.year && currentState.shift) {
+                await loadClasses(currentState.year, currentState.shift);
+            }
         });
 
-        document.getElementById('backToStudents').addEventListener('click', async function() {
-            currentState.student = null;
-            const classObj = dataCache.classes.find(c => c.id === currentState.class);
-            document.getElementById('currentClass').textContent = classObj?.name || '';
-            await loadStudents(currentState.class);
+        document.getElementById('backToStudents').addEventListener('click', async () => {
+            if (currentState.class) {
+                const classObj = dataCache.classes.find(c => c.id === currentState.class);
+                if (classObj) {
+                    await selectClass(currentState.class, classObj.name, currentState.shift);
+                }
+            }
         });
+
+        // Inicialização
+        window.addEventListener('load', initializeSystem);
     </script>
 </body>
 </html>
