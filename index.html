@@ -478,11 +478,12 @@
     <!-- Modais -->
     <div id="modalContainer" class="hidden fixed inset-0 z-[9999]"></div>
     <script>
-        // Configuração do Supabase
+               // Configuração do Supabase
         const SUPABASE_URL = 'https://uxmfrdavdzgubaeurdoe.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4bWZyZGF2ZHpndWJhZXVyZG9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTIzNjIsImV4cCI6MjA2OTI4ODM2Mn0.hscY7pnVbNRTuSuDmM5KlD14rHGZRCnR5NAPzMgXf6A';
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Inicializar cliente Supabase (removido 'const' para evitar redeclaração)
+        window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Estado atual de navegação
         let currentState = {
@@ -555,7 +556,7 @@
 
         // Funções de acesso ao Supabase
         async function dbFetch(table, match = {}) {
-            let query = supabase.from(table).select('*');
+            let query = window.supabaseClient.from(table).select('*');
             if (Object.keys(match).length > 0) {
                 query = query.match(match);
             }
@@ -565,19 +566,19 @@
         }
 
         async function dbInsert(table, record) {
-            const { data, error } = await supabase.from(table).insert([record]).select();
+            const { data, error } = await window.supabaseClient.from(table).insert([record]).select();
             if (error) throw error;
             return data ? data[0] : null;
         }
 
         async function dbUpdate(table, id, updates) {
-            const { error } = await supabase.from(table).update(updates).eq('id', id);
+            const { error } = await window.supabaseClient.from(table).update(updates).eq('id', id);
             if (error) throw error;
             return true;
         }
 
         async function dbDelete(table, id) {
-            const { error } = await supabase.from(table).delete().eq('id', id);
+            const { error } = await window.supabaseClient.from(table).delete().eq('id', id);
             if (error) throw error;
             return true;
         }
