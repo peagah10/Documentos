@@ -13,7 +13,6 @@
     <meta property="og:type" content="website">
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" crossorigin="anonymous">
     
     <script>
@@ -49,7 +48,7 @@
         }
         
         .gradient-bg {
-            background: linear-gradient(135deg, #006838 0%, #006838 100%);
+            background: linear-gradient(135deg, #006838 0%, #004d2b 100%);
         }
         
         .glass-effect {
@@ -104,7 +103,7 @@
         }
 
         .filter-btn.active {
-            background: linear-gradient(135deg, #006838 0%, #006838 100%);
+            background: linear-gradient(135deg, #006838 0%, #004d2b 100%);
             color: white;
         }
 
@@ -121,7 +120,6 @@
             background-color: #374151;
         }
 
-        /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .glass-effect {
                 margin: 0.5rem;
@@ -241,6 +239,17 @@
                     <div class="flex items-center">
                         <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
                         <span class="text-red-700 dark:text-red-400 text-sm">Usuário ou senha incorretos!</span>
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                    <div class="flex items-start">
+                        <i class="fas fa-info-circle text-blue-500 mr-2 mt-0.5"></i>
+                        <div class="text-sm text-blue-700 dark:text-blue-400">
+                            <p class="font-medium">Credenciais de acesso:</p>
+                            <p>Usuário: <strong>admin</strong></p>
+                            <p>Senha: <strong>admin123</strong></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -466,7 +475,6 @@
                     <!-- Área de Pesquisa -->
                     <div class="glass-effect rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 border border-gray-200 dark:border-gray-700">
                         <div class="flex flex-col lg:flex-row gap-4 items-center">
-                            <!-- Pesquisa -->
                             <div class="flex-1 relative w-full">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <i class="fas fa-search text-gray-400"></i>
@@ -475,7 +483,6 @@
                                     class="w-full pl-10 pr-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
                             </div>
                             
-                            <!-- Ordenação -->
                             <div class="flex items-center space-x-3 w-full lg:w-auto">
                                 <label class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap hidden sm:block">Ordenar:</label>
                                 <select id="studentSort" 
@@ -487,13 +494,11 @@
                                 </select>
                             </div>
 
-                            <!-- Contador -->
                             <div class="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
                                 <span id="studentsCount">0 alunos</span>
                             </div>
                         </div>
 
-                        <!-- Filtros rápidos -->
                         <div class="flex flex-wrap gap-2 mt-4">
                             <button onclick="filterStudents('all')" 
                                 class="filter-btn active px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200">
@@ -545,7 +550,6 @@
                         </div>
                     </div>
 
-                    <!-- Documentos do Aluno -->
                     <div class="glass-effect rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 mb-6 sm:mb-8">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
@@ -561,7 +565,6 @@
                         <div id="studentDocumentsList" class="space-y-3"></div>
                     </div>
 
-                    <!-- Botões de ação -->
                     <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                         <button onclick="openRemoveDocumentModal()"
                             class="flex items-center justify-center px-4 sm:px-6 py-3 text-sm font-medium text-red-600 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-200 border border-red-200 dark:border-red-800">
@@ -597,37 +600,86 @@
                 const passwordInput = document.getElementById('password');
                 
                 if (togglePassword && passwordInput) {
-                    togglePassword.removeEventListener('click', handlePasswordToggle);
-                    togglePassword.addEventListener('click', handlePasswordToggle);
+                    togglePassword.addEventListener('click', function() {
+                        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                        passwordInput.setAttribute('type', type);
+                        
+                        const icon = this.querySelector('i');
+                        if (icon) {
+                            if (type === 'password') {
+                                icon.classList.remove('fa-eye-slash');
+                                icon.classList.add('fa-eye');
+                            } else {
+                                icon.classList.remove('fa-eye');
+                                icon.classList.add('fa-eye-slash');
+                            }
+                        }
+                    });
                 }
             }, 100);
         }
 
-        function handlePasswordToggle() {
-            const passwordInput = document.getElementById('password');
-            if (!passwordInput) return;
-            
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            
-            const icon = this.querySelector('i');
-            if (icon) {
-                if (type === 'password') {
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
-                } else {
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
+        // Banco de dados local (localStorage)
+        const LocalDB = {
+            getData(key) {
+                try {
+                    return JSON.parse(localStorage.getItem(key)) || [];
+                } catch {
+                    return [];
                 }
+            },
+            
+            setData(key, data) {
+                localStorage.setItem(key, JSON.stringify(data));
+            },
+            
+            getUsers() {
+                return this.getData('school_users');
+            },
+            
+            getYears() {
+                return this.getData('school_years');
+            },
+            
+            getClasses() {
+                return this.getData('school_classes');
+            },
+            
+            getStudents() {
+                return this.getData('school_students');
+            },
+            
+            getDocuments() {
+                return this.getData('school_documents');
+            },
+            
+            getClassDocuments() {
+                return this.getData('school_class_documents');
+            },
+            
+            generateId() {
+                return Date.now().toString(36) + Math.random().toString(36).substr(2);
+            }
+        };
+
+        // Inicializar banco de dados local
+        function initializeLocalDB() {
+            // Inicializar usuários padrão se não existirem
+            let users = LocalDB.getUsers();
+            if (users.length === 0) {
+                const schools = ['sagrada_familia', 'manoel_serafim', 'joao_lemos', 'jose_rodrigues'];
+                schools.forEach(school => {
+                    users.push({
+                        id: LocalDB.generateId(),
+                        username: 'admin',
+                        password: 'admin123',
+                        school_id: school
+                    });
+                });
+                LocalDB.setData('school_users', users);
             }
         }
 
-        // Configuração do Supabase
-        const SUPABASE_URL = 'https://fzahylkgkqsizorvhvuf.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6YWh5bGtna3FzaXpvcnZodnVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwNzI4MDAsImV4cCI6MjA2NDY0ODgwMH0.xtqVQwHLsUmuuekDegPhVfCSiLQXOCE7wATIQqVorfY';
-
-        let supabaseClient;
-        
         // Estado atual de navegação
         let currentState = {
             school: null,
@@ -664,12 +716,7 @@
                 const year = parseInt(parts[2]);
                 
                 if (year >= 1900 && year <= 2030 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-                    const date = new Date(year, month - 1, day);
-                    const localYear = date.getFullYear();
-                    const localMonth = String(date.getMonth() + 1).padStart(2, '0');
-                    const localDay = String(date.getDate()).padStart(2, '0');
-                    
-                    return `${localYear}-${localMonth}-${localDay}`;
+                    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 }
             }
             return '';
@@ -684,19 +731,14 @@
             try {
                 if (cleanDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
                     const parts = cleanDate.split('-');
-                    const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                    return date.toLocaleDateString('pt-BR');
+                    return `${parts[2]}/${parts[1]}/${parts[0]}`;
                 }
                 
                 if (cleanDate.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
                     return cleanDate;
                 }
                 
-                const date = new Date(cleanDate);
-                if (isNaN(date.getTime())) {
-                    return cleanDate;
-                }
-                return date.toLocaleDateString('pt-BR');
+                return cleanDate;
             } catch (error) {
                 return cleanDate;
             }
@@ -802,63 +844,29 @@
             try {
                 console.log('Inicializando sistema...');
                 
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                initializeLocalDB();
                 
-                const { data, error } = await supabaseClient.from('users').select('*').limit(1);
-                if (error) {
-                    console.error('Erro ao conectar com Supabase:', error);
-                    throw new Error('Erro na conexão com o banco de dados');
-                }
-                
-                await initializeData();
                 document.getElementById('loadingScreen').classList.add('hidden');
                 document.getElementById('loginScreen').classList.remove('hidden');
+                
+                showNotification('Sistema iniciado com sucesso!', 'success');
             } catch (error) {
                 console.error('Erro ao inicializar sistema:', error);
-                alert('Erro ao conectar com o banco de dados: ' + error.message);
-            }
-        }
-
-        async function initializeData() {
-            try {
-                const schools = ['sagrada_familia', 'manoel_serafim', 'joao_lemos', 'jose_rodrigues'];
-                
-                for (const school of schools) {
-                    const { data: users, error: usersError } = await supabaseClient
-                        .from('users')
-                        .select('*')
-                        .eq('school_id', school)
-                        .limit(1);
-
-                    if (usersError) throw usersError;
-
-                    if (!users || users.length === 0) {
-                        const { error: insertError } = await supabaseClient
-                            .from('users')
-                            .insert([{ username: 'admin', password: 'admin123', school_id: school }]);
-                        
-                        if (insertError) throw insertError;
-                    }
-                }
-            } catch (error) {
-                console.error('Erro ao inicializar dados:', error);
-                throw error;
+                alert('Erro ao inicializar sistema: ' + error.message);
             }
         }
 
         // Autenticação
         async function authenticateUser(username, password, schoolId) {
             try {
-                const { data, error } = await supabaseClient
-                    .from('users')
-                    .select('*')
-                    .eq('username', username)
-                    .eq('password', password)
-                    .eq('school_id', schoolId)
-                    .single();
-
-                if (error || !data) return false;
-                return true;
+                const users = LocalDB.getUsers();
+                const user = users.find(u => 
+                    u.username === username && 
+                    u.password === password && 
+                    u.school_id === schoolId
+                );
+                
+                return !!user;
             } catch (error) {
                 console.error('Erro na autenticação:', error);
                 return false;
@@ -871,16 +879,16 @@
                 const schoolId = currentState.school;
                 if (!schoolId) return;
 
-                const { data: years } = await supabaseClient.from('years').select('*').eq('school_id', schoolId);
-                const { data: classes } = await supabaseClient.from('classes').select('*').eq('school_id', schoolId);
-                const { data: students } = await supabaseClient.from('students').select('*').eq('school_id', schoolId);
-                const { data: documents } = await supabaseClient.from('documents').select('*').eq('school_id', schoolId);
-                const { data: classDocuments } = await supabaseClient.from('class_documents').select('*').eq('school_id', schoolId);
+                const years = LocalDB.getYears().filter(y => y.school_id === schoolId);
+                const classes = LocalDB.getClasses().filter(c => c.school_id === schoolId);
+                const students = LocalDB.getStudents().filter(s => s.school_id === schoolId);
+                const documents = LocalDB.getDocuments().filter(d => d.school_id === schoolId);
+                const classDocuments = LocalDB.getClassDocuments().filter(d => d.school_id === schoolId);
 
-                document.getElementById('totalYears').textContent = years?.length || 0;
-                document.getElementById('totalClasses').textContent = classes?.length || 0;
-                document.getElementById('totalStudents').textContent = students?.length || 0;
-                document.getElementById('totalDocuments').textContent = (documents?.length || 0) + (classDocuments?.length || 0);
+                document.getElementById('totalYears').textContent = years.length;
+                document.getElementById('totalClasses').textContent = classes.length;
+                document.getElementById('totalStudents').textContent = students.length;
+                document.getElementById('totalDocuments').textContent = documents.length + classDocuments.length;
             } catch (error) {
                 console.error('Erro ao atualizar estatísticas:', error);
             }
@@ -889,15 +897,12 @@
         // CRUD Anos
         async function getYears() {
             try {
-                const { data, error } = await supabaseClient
-                    .from('years')
-                    .select('*')
-                    .eq('school_id', currentState.school)
-                    .order('year', { ascending: false });
-
-                if (error) throw error;
-                dataCache.years = data || [];
-                return data || [];
+                const years = LocalDB.getYears()
+                    .filter(y => y.school_id === currentState.school)
+                    .sort((a, b) => b.year - a.year);
+                
+                dataCache.years = years;
+                return years;
             } catch (error) {
                 console.error('Erro ao carregar anos:', error);
                 return [];
@@ -906,14 +911,15 @@
 
         async function addYear(year) {
             try {
-                const { data, error } = await supabaseClient
-                    .from('years')
-                    .insert([{ year: year, school_id: currentState.school }])
-                    .select()
-                    .single();
-
-                if (error) throw error;
-                return data;
+                const years = LocalDB.getYears();
+                const newYear = {
+                    id: LocalDB.generateId(),
+                    year: year,
+                    school_id: currentState.school
+                };
+                years.push(newYear);
+                LocalDB.setData('school_years', years);
+                return newYear;
             } catch (error) {
                 console.error('Erro ao adicionar ano:', error);
                 throw error;
@@ -922,64 +928,32 @@
 
         async function deleteYear(yearId) {
             try {
-                // Get all classes for this year
-                const { data: classes } = await supabaseClient
-                    .from('classes')
-                    .select('id')
-                    .eq('year_id', yearId)
-                    .eq('school_id', currentState.school);
-
-                const classIds = classes?.map(c => c.id) || [];
-
-                if (classIds.length > 0) {
-                    // Get all students in these classes
-                    const { data: students } = await supabaseClient
-                        .from('students')
-                        .select('id')
-                        .in('class_id', classIds)
-                        .eq('school_id', currentState.school);
-
-                    const studentIds = students?.map(s => s.id) || [];
-
-                    if (studentIds.length > 0) {
-                        // Delete documents for these students
-                        await supabaseClient
-                            .from('documents')
-                            .delete()
-                            .in('student_id', studentIds)
-                            .eq('school_id', currentState.school);
-
-                        // Delete students
-                        await supabaseClient
-                            .from('students')
-                            .delete()
-                            .in('id', studentIds)
-                            .eq('school_id', currentState.school);
-                    }
-
-                    // Delete class documents
-                    await supabaseClient
-                        .from('class_documents')
-                        .delete()
-                        .in('class_id', classIds)
-                        .eq('school_id', currentState.school);
-
-                    // Delete classes
-                    await supabaseClient
-                        .from('classes')
-                        .delete()
-                        .in('id', classIds)
-                        .eq('school_id', currentState.school);
-                }
-
-                // Delete the year
-                const { error } = await supabaseClient
-                    .from('years')
-                    .delete()
-                    .eq('id', yearId)
-                    .eq('school_id', currentState.school);
-
-                if (error) throw error;
+                let years = LocalDB.getYears();
+                years = years.filter(y => y.id !== yearId);
+                LocalDB.setData('school_years', years);
+                
+                // Delete related classes
+                let classes = LocalDB.getClasses();
+                const classIds = classes.filter(c => c.year_id === yearId).map(c => c.id);
+                classes = classes.filter(c => c.year_id !== yearId);
+                LocalDB.setData('school_classes', classes);
+                
+                // Delete related students
+                let students = LocalDB.getStudents();
+                const studentIds = students.filter(s => classIds.includes(s.class_id)).map(s => s.id);
+                students = students.filter(s => !classIds.includes(s.class_id));
+                LocalDB.setData('school_students', students);
+                
+                // Delete related documents
+                let documents = LocalDB.getDocuments();
+                documents = documents.filter(d => !studentIds.includes(d.student_id));
+                LocalDB.setData('school_documents', documents);
+                
+                // Delete related class documents
+                let classDocuments = LocalDB.getClassDocuments();
+                classDocuments = classDocuments.filter(d => !classIds.includes(d.class_id));
+                LocalDB.setData('school_class_documents', classDocuments);
+                
                 return true;
             } catch (error) {
                 console.error('Erro ao deletar ano:', error);
@@ -990,21 +964,16 @@
         // CRUD Turmas
         async function getClasses(yearId, shift = null) {
             try {
-                let query = supabaseClient
-                    .from('classes')
-                    .select('*')
-                    .eq('year_id', yearId)
-                    .eq('school_id', currentState.school);
+                let classes = LocalDB.getClasses()
+                    .filter(c => c.year_id === yearId && c.school_id === currentState.school);
                 
                 if (shift) {
-                    query = query.eq('shift', shift);
+                    classes = classes.filter(c => c.shift === shift);
                 }
                 
-                const { data, error } = await query.order('name');
-
-                if (error) throw error;
-                dataCache.classes = data || [];
-                return data || [];
+                classes.sort((a, b) => a.name.localeCompare(b.name));
+                dataCache.classes = classes;
+                return classes;
             } catch (error) {
                 console.error('Erro ao carregar turmas:', error);
                 return [];
@@ -1013,14 +982,17 @@
 
         async function addClass(yearId, name, shift) {
             try {
-                const { data, error } = await supabaseClient
-                    .from('classes')
-                    .insert([{ year_id: yearId, name: name, shift: shift, school_id: currentState.school }])
-                    .select()
-                    .single();
-
-                if (error) throw error;
-                return data;
+                const classes = LocalDB.getClasses();
+                const newClass = {
+                    id: LocalDB.generateId(),
+                    year_id: yearId,
+                    name: name,
+                    shift: shift,
+                    school_id: currentState.school
+                };
+                classes.push(newClass);
+                LocalDB.setData('school_classes', classes);
+                return newClass;
             } catch (error) {
                 console.error('Erro ao adicionar turma:', error);
                 throw error;
@@ -1029,46 +1001,26 @@
 
         async function deleteClass(classId) {
             try {
-                // Get all students in this class
-                const { data: students } = await supabaseClient
-                    .from('students')
-                    .select('id')
-                    .eq('class_id', classId)
-                    .eq('school_id', currentState.school);
-
-                const studentIds = students?.map(s => s.id) || [];
-
-                if (studentIds.length > 0) {
-                    // Delete documents for these students
-                    await supabaseClient
-                        .from('documents')
-                        .delete()
-                        .in('student_id', studentIds)
-                        .eq('school_id', currentState.school);
-
-                    // Delete students
-                    await supabaseClient
-                        .from('students')
-                        .delete()
-                        .in('id', studentIds)
-                        .eq('school_id', currentState.school);
-                }
-
-                // Delete class documents
-                await supabaseClient
-                    .from('class_documents')
-                    .delete()
-                    .eq('class_id', classId)
-                    .eq('school_id', currentState.school);
-
-                // Delete the class
-                const { error } = await supabaseClient
-                    .from('classes')
-                    .delete()
-                    .eq('id', classId)
-                    .eq('school_id', currentState.school);
-
-                if (error) throw error;
+                let classes = LocalDB.getClasses();
+                classes = classes.filter(c => c.id !== classId);
+                LocalDB.setData('school_classes', classes);
+                
+                // Delete related students
+                let students = LocalDB.getStudents();
+                const studentIds = students.filter(s => s.class_id === classId).map(s => s.id);
+                students = students.filter(s => s.class_id !== classId);
+                LocalDB.setData('school_students', students);
+                
+                // Delete related documents
+                let documents = LocalDB.getDocuments();
+                documents = documents.filter(d => !studentIds.includes(d.student_id));
+                LocalDB.setData('school_documents', documents);
+                
+                // Delete related class documents
+                let classDocuments = LocalDB.getClassDocuments();
+                classDocuments = classDocuments.filter(d => d.class_id !== classId);
+                LocalDB.setData('school_class_documents', classDocuments);
+                
                 return true;
             } catch (error) {
                 console.error('Erro ao deletar turma:', error);
@@ -1079,16 +1031,12 @@
         // CRUD Alunos
         async function getStudents(classId) {
             try {
-                const { data, error } = await supabaseClient
-                    .from('students')
-                    .select('*')
-                    .eq('class_id', classId)
-                    .eq('school_id', currentState.school)
-                    .order('name');
-
-                if (error) throw error;
-                dataCache.students = data || [];
-                return data || [];
+                const students = LocalDB.getStudents()
+                    .filter(s => s.class_id === classId && s.school_id === currentState.school)
+                    .sort((a, b) => a.name.localeCompare(b.name));
+                
+                dataCache.students = students;
+                return students;
             } catch (error) {
                 console.error('Erro ao carregar alunos:', error);
                 return [];
@@ -1097,21 +1045,19 @@
 
         async function addStudent(classId, name, matricula, cpf = '', birthDate = '') {
             try {
-                const { data, error } = await supabaseClient
-                    .from('students')
-                    .insert([{ 
-                        class_id: classId, 
-                        name: name, 
-                        matricula: matricula, 
-                        cpf: cpf,
-                        birth_date: birthDate,
-                        school_id: currentState.school 
-                    }])
-                    .select()
-                    .single();
-
-                if (error) throw error;
-                return data;
+                const students = LocalDB.getStudents();
+                const newStudent = {
+                    id: LocalDB.generateId(),
+                    class_id: classId,
+                    name: name,
+                    matricula: matricula,
+                    cpf: cpf,
+                    birth_date: birthDate,
+                    school_id: currentState.school
+                };
+                students.push(newStudent);
+                LocalDB.setData('school_students', students);
+                return newStudent;
             } catch (error) {
                 console.error('Erro ao adicionar aluno:', error);
                 throw error;
@@ -1120,21 +1066,15 @@
 
         async function deleteStudent(studentId) {
             try {
-                // Delete documents for this student
-                await supabaseClient
-                    .from('documents')
-                    .delete()
-                    .eq('student_id', studentId)
-                    .eq('school_id', currentState.school);
-
-                // Delete the student
-                const { error } = await supabaseClient
-                    .from('students')
-                    .delete()
-                    .eq('id', studentId)
-                    .eq('school_id', currentState.school);
-
-                if (error) throw error;
+                let students = LocalDB.getStudents();
+                students = students.filter(s => s.id !== studentId);
+                LocalDB.setData('school_students', students);
+                
+                // Delete related documents
+                let documents = LocalDB.getDocuments();
+                documents = documents.filter(d => d.student_id !== studentId);
+                LocalDB.setData('school_documents', documents);
+                
                 return true;
             } catch (error) {
                 console.error('Erro ao deletar aluno:', error);
@@ -1145,16 +1085,12 @@
         // CRUD Documentos
         async function getDocuments(studentId) {
             try {
-                const { data, error } = await supabaseClient
-                    .from('documents')
-                    .select('*')
-                    .eq('student_id', studentId)
-                    .eq('school_id', currentState.school)
-                    .order('date', { ascending: false });
-
-                if (error) throw error;
-                dataCache.documents = data || [];
-                return data || [];
+                const documents = LocalDB.getDocuments()
+                    .filter(d => d.student_id === studentId && d.school_id === currentState.school)
+                    .sort((a, b) => b.date.localeCompare(a.date));
+                
+                dataCache.documents = documents;
+                return documents;
             } catch (error) {
                 console.error('Erro ao carregar documentos:', error);
                 return [];
@@ -1163,21 +1099,19 @@
 
         async function addDocument(studentId, type, name, path) {
             try {
-                const { data, error } = await supabaseClient
-                    .from('documents')
-                    .insert([{ 
-                        student_id: studentId, 
-                        type: type, 
-                        name: name, 
-                        path: path,
-                        date: new Date().toISOString().split('T')[0],
-                        school_id: currentState.school
-                    }])
-                    .select()
-                    .single();
-
-                if (error) throw error;
-                return data;
+                const documents = LocalDB.getDocuments();
+                const newDocument = {
+                    id: LocalDB.generateId(),
+                    student_id: studentId,
+                    type: type,
+                    name: name,
+                    path: path,
+                    date: new Date().toISOString().split('T')[0],
+                    school_id: currentState.school
+                };
+                documents.push(newDocument);
+                LocalDB.setData('school_documents', documents);
+                return newDocument;
             } catch (error) {
                 console.error('Erro ao adicionar documento:', error);
                 throw error;
@@ -1186,13 +1120,9 @@
 
         async function deleteDocument(documentId) {
             try {
-                const { error } = await supabaseClient
-                    .from('documents')
-                    .delete()
-                    .eq('id', documentId)
-                    .eq('school_id', currentState.school);
-
-                if (error) throw error;
+                let documents = LocalDB.getDocuments();
+                documents = documents.filter(d => d.id !== documentId);
+                LocalDB.setData('school_documents', documents);
                 return true;
             } catch (error) {
                 console.error('Erro ao deletar documento:', error);
@@ -1203,16 +1133,12 @@
         // CRUD Documentos da Turma
         async function getClassDocuments(classId) {
             try {
-                const { data, error } = await supabaseClient
-                    .from('class_documents')
-                    .select('*')
-                    .eq('class_id', classId)
-                    .eq('school_id', currentState.school)
-                    .order('date', { ascending: false });
-
-                if (error) throw error;
-                dataCache.classDocuments = data || [];
-                return data || [];
+                const classDocuments = LocalDB.getClassDocuments()
+                    .filter(d => d.class_id === classId && d.school_id === currentState.school)
+                    .sort((a, b) => b.date.localeCompare(a.date));
+                
+                dataCache.classDocuments = classDocuments;
+                return classDocuments;
             } catch (error) {
                 console.error('Erro ao carregar documentos da turma:', error);
                 return [];
@@ -1221,21 +1147,19 @@
 
         async function addClassDocument(classId, type, name, path) {
             try {
-                const { data, error } = await supabaseClient
-                    .from('class_documents')
-                    .insert([{ 
-                        class_id: classId, 
-                        type: type, 
-                        name: name, 
-                        path: path,
-                        date: new Date().toISOString().split('T')[0],
-                        school_id: currentState.school
-                    }])
-                    .select()
-                    .single();
-
-                if (error) throw error;
-                return data;
+                const classDocuments = LocalDB.getClassDocuments();
+                const newDocument = {
+                    id: LocalDB.generateId(),
+                    class_id: classId,
+                    type: type,
+                    name: name,
+                    path: path,
+                    date: new Date().toISOString().split('T')[0],
+                    school_id: currentState.school
+                };
+                classDocuments.push(newDocument);
+                LocalDB.setData('school_class_documents', classDocuments);
+                return newDocument;
             } catch (error) {
                 console.error('Erro ao adicionar documento da turma:', error);
                 throw error;
@@ -1258,26 +1182,9 @@
 
                 document.getElementById('clearSearchBtn').classList.remove('hidden');
                 
-                const { data: allStudents, error } = await supabaseClient
-                    .from('students')
-                    .select(`
-                        *,
-                        classes:class_id (
-                            id,
-                            name,
-                            shift,
-                            years:year_id (
-                                id,
-                                year
-                            )
-                        )
-                    `)
-                    .eq('school_id', currentState.school);
-
-                if (error) {
-                    console.error('Erro na pesquisa:', error);
-                    throw error;
-                }
+                const allStudents = LocalDB.getStudents().filter(s => s.school_id === currentState.school);
+                const allClasses = LocalDB.getClasses();
+                const allYears = LocalDB.getYears();
 
                 const filteredStudents = allStudents.filter(student => {
                     const name = (student.name || '').toLowerCase();
@@ -1314,9 +1221,11 @@
                 }
 
                 filteredStudents.forEach(student => {
-                    const year = student.classes?.years?.year || 'N/A';
-                    const className = student.classes?.name || 'N/A';
-                    const shift = student.classes?.shift || '';
+                    const classObj = allClasses.find(c => c.id === student.class_id);
+                    const yearObj = classObj ? allYears.find(y => y.id === classObj.year_id) : null;
+                    const year = yearObj?.year || 'N/A';
+                    const className = classObj?.name || 'N/A';
+                    const shift = classObj?.shift || '';
                     
                     let displayName = student.name;
                     let displayMatricula = student.matricula;
@@ -1353,7 +1262,7 @@
                     `;
                     
                     card.addEventListener('click', () => {
-                        selectStudentDirectly(student.id, student.name, student.class_id, student.classes.years.id, student.classes.shift);
+                        selectStudentDirectly(student.id, student.name, student.class_id, classObj?.year_id, classObj?.shift);
                     });
                     
                     searchResults.appendChild(card);
@@ -1578,8 +1487,11 @@
                 btn.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
             });
             
-            document.querySelector('.filter-btn[onclick="filterStudents(\'all\')"]').classList.add('active');
-            document.querySelector('.filter-btn[onclick="filterStudents(\'all\')"]').classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+            const allBtn = document.querySelector('.filter-btn[onclick="filterStudents(\'all\')"]');
+            if (allBtn) {
+                allBtn.classList.add('active');
+                allBtn.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+            }
             
             applyStudentFilters();
         }
@@ -1642,10 +1554,6 @@
                 URL.revokeObjectURL(link.href);
                 
                 showNotification(`Dados de ${students.length} aluno(s) exportados com sucesso!`);
-                
-                setTimeout(() => {
-                    showNotification('Dica: Abra o arquivo no Excel e use "Dados > Texto para Colunas" com separador ";" se necessário', 'info');
-                }, 2000);
                 
             } catch (error) {
                 console.error('Erro ao exportar dados:', error);
@@ -1932,13 +1840,11 @@
                 const studentCpf = document.getElementById('studentCpf').value;
                 const studentMatricula = document.getElementById('studentMatricula').value;
                 
-                const { data: existingStudents } = await supabaseClient
-                    .from('students')
-                    .select('matricula')
-                    .eq('matricula', studentMatricula)
-                    .eq('school_id', currentState.school);
+                const existingStudents = LocalDB.getStudents().filter(s => 
+                    s.matricula === studentMatricula && s.school_id === currentState.school
+                );
 
-                if (existingStudents && existingStudents.length > 0) {
+                if (existingStudents.length > 0) {
                     showNotification('Esta matrícula já está cadastrada!', 'error');
                     return;
                 }
@@ -2755,12 +2661,9 @@
             card.className = 'card-hover bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 cursor-pointer border border-gray-200 dark:border-gray-700';
             
             const iconBg = options.iconBg || 'gradient-bg';
-            const iconClass = options.iconClass || '';
             
             let iconContent = '';
-            if (iconClass) {
-                iconContent = `<i class="${iconClass} text-white text-lg sm:text-xl"></i>`;
-            } else if (icon) {
+            if (icon) {
                 iconContent = `<img src="${icon}" alt="Ícone" class="w-full h-full object-cover rounded-xl">`;
             }
             
@@ -3139,13 +3042,8 @@
         // Visualizar documento
         async function viewDocument(documentId) {
             try {
-                const { data: document, error } = await supabaseClient
-                    .from('documents')
-                    .select('*')
-                    .eq('id', documentId)
-                    .single();
-
-                if (error) throw error;
+                const documents = LocalDB.getDocuments();
+                const document = documents.find(d => d.id === documentId);
 
                 if (document && document.path) {
                     const newWindow = window.open();
@@ -3176,13 +3074,8 @@
         // Visualizar documento da turma
         async function viewClassDocument(documentId) {
             try {
-                const { data: document, error } = await supabaseClient
-                    .from('class_documents')
-                    .select('*')
-                    .eq('id', documentId)
-                    .single();
-
-                if (error) throw error;
+                const classDocuments = LocalDB.getClassDocuments();
+                const document = classDocuments.find(d => d.id === documentId);
 
                 if (document && document.path) {
                     const newWindow = window.open();
