@@ -12,12 +12,9 @@
     <meta property="og:url" content="https://documentos-escolares.netlify.app/">
     <meta property="og:type" content="website">
 
-<!-- Instagram usa as mesmas tags do Open Graph -->
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" crossorigin="anonymous">
-    
     
     <script>
         tailwind.config = {
@@ -595,13 +592,11 @@
 
         // Toggle password visibility
         function initializePasswordToggle() {
-            // Usar setTimeout para garantir que o DOM esteja pronto
             setTimeout(() => {
                 const togglePassword = document.getElementById('togglePassword');
                 const passwordInput = document.getElementById('password');
                 
                 if (togglePassword && passwordInput) {
-                    // Remover listeners existentes para evitar duplicação
                     togglePassword.removeEventListener('click', handlePasswordToggle);
                     togglePassword.addEventListener('click', handlePasswordToggle);
                 }
@@ -631,7 +626,7 @@
         const SUPABASE_URL = 'https://fzahylkgkqsizorvhvuf.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6YWh5bGtna3FzaXpvcnZodnVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwNzI4MDAsImV4cCI6MjA2NDY0ODgwMH0.xtqVQwHLsUmuuekDegPhVfCSiLQXOCE7wATIQqVorfY';
 
-        let supabase;
+        let supabaseClient;
         
         // Estado atual de navegação
         let currentState = {
@@ -658,60 +653,54 @@
             filterBy: 'all'
         };
 
-        // Função para converter data brasileira para formato ISO (sem problemas de fuso horário)
-function convertBrazilianDate(brazilianDate) {
-    if (!brazilianDate) return '';
-    
-    const parts = brazilianDate.split('/');
-    if (parts.length === 3) {
-        const day = parseInt(parts[0]);
-        const month = parseInt(parts[1]);
-        const year = parseInt(parts[2]);
-        
-        // Validar se a data é válida
-        if (year >= 1900 && year <= 2030 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-            // Criar data local e retornar no formato ISO local
-            const date = new Date(year, month - 1, day); // month - 1 porque Date usa mês base 0
-            const localYear = date.getFullYear();
-            const localMonth = String(date.getMonth() + 1).padStart(2, '0');
-            const localDay = String(date.getDate()).padStart(2, '0');
+        // Função para converter data brasileira para formato ISO
+        function convertBrazilianDate(brazilianDate) {
+            if (!brazilianDate) return '';
             
-            return `${localYear}-${localMonth}-${localDay}`;
+            const parts = brazilianDate.split('/');
+            if (parts.length === 3) {
+                const day = parseInt(parts[0]);
+                const month = parseInt(parts[1]);
+                const year = parseInt(parts[2]);
+                
+                if (year >= 1900 && year <= 2030 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+                    const date = new Date(year, month - 1, day);
+                    const localYear = date.getFullYear();
+                    const localMonth = String(date.getMonth() + 1).padStart(2, '0');
+                    const localDay = String(date.getDate()).padStart(2, '0');
+                    
+                    return `${localYear}-${localMonth}-${localDay}`;
+                }
+            }
+            return '';
         }
-    }
-    return '';
-}
 
         // Função auxiliar para formatar data com segurança
-function formatDateSafe(dateString) {
-    if (!dateString) return '';
-    
-    // Se já contém HTML (highlight), extrair a data primeiro
-    const cleanDate = dateString.replace(/<[^>]*>/g, '');
-    
-    try {
-        // Se está no formato ISO (YYYY-MM-DD), tratar como data local
-        if (cleanDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
-            const parts = cleanDate.split('-');
-            const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-            return date.toLocaleDateString('pt-BR');
+        function formatDateSafe(dateString) {
+            if (!dateString) return '';
+            
+            const cleanDate = dateString.replace(/<[^>]*>/g, '');
+            
+            try {
+                if (cleanDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    const parts = cleanDate.split('-');
+                    const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                    return date.toLocaleDateString('pt-BR');
+                }
+                
+                if (cleanDate.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                    return cleanDate;
+                }
+                
+                const date = new Date(cleanDate);
+                if (isNaN(date.getTime())) {
+                    return cleanDate;
+                }
+                return date.toLocaleDateString('pt-BR');
+            } catch (error) {
+                return cleanDate;
+            }
         }
-        
-        // Se já está no formato brasileiro, retornar como está
-        if (cleanDate.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-            return cleanDate;
-        }
-        
-        // Tentar como Data normal
-        const date = new Date(cleanDate);
-        if (isNaN(date.getTime())) {
-            return cleanDate; // Retorna a string original se não for uma data válida
-        }
-        return date.toLocaleDateString('pt-BR');
-    } catch (error) {
-        return cleanDate; // Retorna a string original em caso de erro
-    }
-}
 
         // Configuração das escolas
         const schoolsConfig = {
@@ -737,7 +726,7 @@ function formatDateSafe(dateString) {
             }
         };
 
-        // Turnos disponíveis com imagens reais
+        // Turnos disponíveis
         const shiftsConfig = {
             matutino: {
                 name: 'Matutino',
@@ -761,7 +750,6 @@ function formatDateSafe(dateString) {
             const school = schoolsConfig[schoolId];
             if (!school) return;
 
-            // Atualizar logos e nomes
             document.getElementById('schoolLogo').querySelector('img').src = school.logo;
             document.getElementById('schoolName').textContent = school.name;
             document.getElementById('headerLogo').querySelector('img').src = school.logo;
@@ -814,9 +802,9 @@ function formatDateSafe(dateString) {
             try {
                 console.log('Inicializando sistema...');
                 
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 
-                const { data, error } = await supabase.from('users').select('*').limit(1);
+                const { data, error } = await supabaseClient.from('users').select('*').limit(1);
                 if (error) {
                     console.error('Erro ao conectar com Supabase:', error);
                     throw new Error('Erro na conexão com o banco de dados');
@@ -833,11 +821,10 @@ function formatDateSafe(dateString) {
 
         async function initializeData() {
             try {
-                // Verificar se as tabelas já têm os usuários padrão para cada escola
                 const schools = ['sagrada_familia', 'manoel_serafim', 'joao_lemos', 'jose_rodrigues'];
                 
                 for (const school of schools) {
-                    const { data: users, error: usersError } = await supabase
+                    const { data: users, error: usersError } = await supabaseClient
                         .from('users')
                         .select('*')
                         .eq('school_id', school)
@@ -846,7 +833,7 @@ function formatDateSafe(dateString) {
                     if (usersError) throw usersError;
 
                     if (!users || users.length === 0) {
-                        const { error: insertError } = await supabase
+                        const { error: insertError } = await supabaseClient
                             .from('users')
                             .insert([{ username: 'admin', password: 'admin123', school_id: school }]);
                         
@@ -862,7 +849,7 @@ function formatDateSafe(dateString) {
         // Autenticação
         async function authenticateUser(username, password, schoolId) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('users')
                     .select('*')
                     .eq('username', username)
@@ -884,15 +871,16 @@ function formatDateSafe(dateString) {
                 const schoolId = currentState.school;
                 if (!schoolId) return;
 
-                const { data: years } = await supabase.from('years').select('*').eq('school_id', schoolId);
-                const { data: classes } = await supabase.from('classes').select('*').eq('school_id', schoolId);
-                const { data: students } = await supabase.from('students').select('*').eq('school_id', schoolId);
-                const { data: documents } = await supabase.from('documents').select('*').eq('school_id', schoolId);
+                const { data: years } = await supabaseClient.from('years').select('*').eq('school_id', schoolId);
+                const { data: classes } = await supabaseClient.from('classes').select('*').eq('school_id', schoolId);
+                const { data: students } = await supabaseClient.from('students').select('*').eq('school_id', schoolId);
+                const { data: documents } = await supabaseClient.from('documents').select('*').eq('school_id', schoolId);
+                const { data: classDocuments } = await supabaseClient.from('class_documents').select('*').eq('school_id', schoolId);
 
                 document.getElementById('totalYears').textContent = years?.length || 0;
                 document.getElementById('totalClasses').textContent = classes?.length || 0;
                 document.getElementById('totalStudents').textContent = students?.length || 0;
-                document.getElementById('totalDocuments').textContent = documents?.length || 0;
+                document.getElementById('totalDocuments').textContent = (documents?.length || 0) + (classDocuments?.length || 0);
             } catch (error) {
                 console.error('Erro ao atualizar estatísticas:', error);
             }
@@ -901,7 +889,7 @@ function formatDateSafe(dateString) {
         // CRUD Anos
         async function getYears() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('years')
                     .select('*')
                     .eq('school_id', currentState.school)
@@ -918,7 +906,7 @@ function formatDateSafe(dateString) {
 
         async function addYear(year) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('years')
                     .insert([{ year: year, school_id: currentState.school }])
                     .select()
@@ -934,38 +922,58 @@ function formatDateSafe(dateString) {
 
         async function deleteYear(yearId) {
             try {
-                const { data: students } = await supabase
-                    .from('students')
-                    .select('id')
-                    .in('class_id', (await supabase
-                        .from('classes')
-                        .select('id')
-                        .eq('year_id', yearId)
-                        .eq('school_id', currentState.school)).data?.map(c => c.id) || []);
-
-                if (students && students.length > 0) {
-                    await supabase
-                        .from('documents')
-                        .delete()
-                        .in('student_id', students.map(s => s.id));
-                }
-
-                await supabase
-                    .from('students')
-                    .delete()
-                    .in('class_id', (await supabase
-                        .from('classes')
-                        .select('id')
-                        .eq('year_id', yearId)
-                        .eq('school_id', currentState.school)).data?.map(c => c.id) || []);
-
-                await supabase
+                // Get all classes for this year
+                const { data: classes } = await supabaseClient
                     .from('classes')
-                    .delete()
+                    .select('id')
                     .eq('year_id', yearId)
                     .eq('school_id', currentState.school);
 
-                const { error } = await supabase
+                const classIds = classes?.map(c => c.id) || [];
+
+                if (classIds.length > 0) {
+                    // Get all students in these classes
+                    const { data: students } = await supabaseClient
+                        .from('students')
+                        .select('id')
+                        .in('class_id', classIds)
+                        .eq('school_id', currentState.school);
+
+                    const studentIds = students?.map(s => s.id) || [];
+
+                    if (studentIds.length > 0) {
+                        // Delete documents for these students
+                        await supabaseClient
+                            .from('documents')
+                            .delete()
+                            .in('student_id', studentIds)
+                            .eq('school_id', currentState.school);
+
+                        // Delete students
+                        await supabaseClient
+                            .from('students')
+                            .delete()
+                            .in('id', studentIds)
+                            .eq('school_id', currentState.school);
+                    }
+
+                    // Delete class documents
+                    await supabaseClient
+                        .from('class_documents')
+                        .delete()
+                        .in('class_id', classIds)
+                        .eq('school_id', currentState.school);
+
+                    // Delete classes
+                    await supabaseClient
+                        .from('classes')
+                        .delete()
+                        .in('id', classIds)
+                        .eq('school_id', currentState.school);
+                }
+
+                // Delete the year
+                const { error } = await supabaseClient
                     .from('years')
                     .delete()
                     .eq('id', yearId)
@@ -982,7 +990,7 @@ function formatDateSafe(dateString) {
         // CRUD Turmas
         async function getClasses(yearId, shift = null) {
             try {
-                let query = supabase
+                let query = supabaseClient
                     .from('classes')
                     .select('*')
                     .eq('year_id', yearId)
@@ -1005,7 +1013,7 @@ function formatDateSafe(dateString) {
 
         async function addClass(yearId, name, shift) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('classes')
                     .insert([{ year_id: yearId, name: name, shift: shift, school_id: currentState.school }])
                     .select()
@@ -1021,33 +1029,40 @@ function formatDateSafe(dateString) {
 
         async function deleteClass(classId) {
             try {
-                const { data: students } = await supabase
+                // Get all students in this class
+                const { data: students } = await supabaseClient
                     .from('students')
                     .select('id')
                     .eq('class_id', classId)
                     .eq('school_id', currentState.school);
 
-                if (students && students.length > 0) {
-                    await supabase
+                const studentIds = students?.map(s => s.id) || [];
+
+                if (studentIds.length > 0) {
+                    // Delete documents for these students
+                    await supabaseClient
                         .from('documents')
                         .delete()
-                        .in('student_id', students.map(s => s.id));
+                        .in('student_id', studentIds)
+                        .eq('school_id', currentState.school);
+
+                    // Delete students
+                    await supabaseClient
+                        .from('students')
+                        .delete()
+                        .in('id', studentIds)
+                        .eq('school_id', currentState.school);
                 }
 
-                await supabase
-                    .from('students')
-                    .delete()
-                    .eq('class_id', classId)
-                    .eq('school_id', currentState.school);
-
                 // Delete class documents
-                await supabase
+                await supabaseClient
                     .from('class_documents')
                     .delete()
                     .eq('class_id', classId)
                     .eq('school_id', currentState.school);
 
-                const { error } = await supabase
+                // Delete the class
+                const { error } = await supabaseClient
                     .from('classes')
                     .delete()
                     .eq('id', classId)
@@ -1064,7 +1079,7 @@ function formatDateSafe(dateString) {
         // CRUD Alunos
         async function getStudents(classId) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('students')
                     .select('*')
                     .eq('class_id', classId)
@@ -1082,7 +1097,7 @@ function formatDateSafe(dateString) {
 
         async function addStudent(classId, name, matricula, cpf = '', birthDate = '') {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('students')
                     .insert([{ 
                         class_id: classId, 
@@ -1105,13 +1120,15 @@ function formatDateSafe(dateString) {
 
         async function deleteStudent(studentId) {
             try {
-                await supabase
+                // Delete documents for this student
+                await supabaseClient
                     .from('documents')
                     .delete()
                     .eq('student_id', studentId)
                     .eq('school_id', currentState.school);
 
-                const { error } = await supabase
+                // Delete the student
+                const { error } = await supabaseClient
                     .from('students')
                     .delete()
                     .eq('id', studentId)
@@ -1128,7 +1145,7 @@ function formatDateSafe(dateString) {
         // CRUD Documentos
         async function getDocuments(studentId) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('documents')
                     .select('*')
                     .eq('student_id', studentId)
@@ -1146,7 +1163,7 @@ function formatDateSafe(dateString) {
 
         async function addDocument(studentId, type, name, path) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('documents')
                     .insert([{ 
                         student_id: studentId, 
@@ -1169,7 +1186,7 @@ function formatDateSafe(dateString) {
 
         async function deleteDocument(documentId) {
             try {
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('documents')
                     .delete()
                     .eq('id', documentId)
@@ -1186,7 +1203,7 @@ function formatDateSafe(dateString) {
         // CRUD Documentos da Turma
         async function getClassDocuments(classId) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('class_documents')
                     .select('*')
                     .eq('class_id', classId)
@@ -1204,7 +1221,7 @@ function formatDateSafe(dateString) {
 
         async function addClassDocument(classId, type, name, path) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('class_documents')
                     .insert([{ 
                         class_id: classId, 
@@ -1225,7 +1242,7 @@ function formatDateSafe(dateString) {
             }
         }
 
-        // Pesquisa Global - CORRIGIDA
+        // Pesquisa Global
         async function searchGlobalStudents(searchTerm) {
             try {
                 if (!searchTerm || searchTerm.length < 2) {
@@ -1241,7 +1258,7 @@ function formatDateSafe(dateString) {
 
                 document.getElementById('clearSearchBtn').classList.remove('hidden');
                 
-                const { data: allStudents, error } = await supabase
+                const { data: allStudents, error } = await supabaseClient
                     .from('students')
                     .select(`
                         *,
@@ -1262,7 +1279,6 @@ function formatDateSafe(dateString) {
                     throw error;
                 }
 
-                // Filtrar resultados localmente para evitar problemas com campos null
                 const filteredStudents = allStudents.filter(student => {
                     const name = (student.name || '').toLowerCase();
                     const matricula = (student.matricula || '').toLowerCase();
@@ -1297,7 +1313,7 @@ function formatDateSafe(dateString) {
                     return;
                 }
 
-                    filteredStudents.forEach(student => {
+                filteredStudents.forEach(student => {
                     const year = student.classes?.years?.year || 'N/A';
                     const className = student.classes?.name || 'N/A';
                     const shift = student.classes?.shift || '';
@@ -1332,7 +1348,7 @@ function formatDateSafe(dateString) {
                         <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-1">${displayName}</h4>
                         <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Mat: ${displayMatricula}</p>
                         ${displayCpf ? `<p class="text-sm text-gray-600 dark:text-gray-400 mb-1">CPF: ${displayCpf}</p>` : ''}
-                       ${displayBirthDate ? `<p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Nasc: ${formatDateSafe(displayBirthDate)}</p>` : ''}
+                        ${displayBirthDate ? `<p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Nasc: ${formatDateSafe(displayBirthDate)}</p>` : ''}
                         <p class="text-xs text-gray-500 dark:text-gray-500">${year} - ${shiftsConfig[shift]?.name || shift} - ${className}</p>
                     `;
                     
@@ -1351,25 +1367,20 @@ function formatDateSafe(dateString) {
 
         async function selectStudentDirectly(studentId, studentName, classId, yearId, shift) {
             try {
-                // Atualizar o estado atual
                 currentState.year = yearId;
                 currentState.shift = shift;
                 currentState.class = classId;
                 currentState.student = studentId;
                 
-                // Limpar pesquisa
                 clearGlobalSearch();
                 
-                // Carregar dados necessários no cache
                 await getYears();
                 await getClasses(yearId, shift);
                 await getStudents(classId);
                 
-                // Ir diretamente para os documentos
                 document.getElementById('currentStudent').textContent = studentName;
                 await loadDocuments(studentId);
                 
-                // Atualizar breadcrumb
                 const yearObj = dataCache.years.find(y => y.id === yearId);
                 const classObj = dataCache.classes.find(c => c.id === classId);
                 const shiftName = shiftsConfig[shift]?.name || shift;
@@ -1435,7 +1446,6 @@ function formatDateSafe(dateString) {
             const students = await getStudents(currentState.class);
             let filteredStudents = [...students];
 
-            // Aplicar pesquisa
             if (filterState.searchTerm) {
                 filteredStudents = filteredStudents.filter(student => 
                     student.name.toLowerCase().includes(filterState.searchTerm) ||
@@ -1444,7 +1454,6 @@ function formatDateSafe(dateString) {
                 );
             }
 
-            // Aplicar filtro por documentos
             if (filterState.filterBy !== 'all') {
                 const studentsWithDocs = [];
                 for (const student of filteredStudents) {
@@ -1468,7 +1477,6 @@ function formatDateSafe(dateString) {
                 }
             }
 
-            // Aplicar ordenação
             filteredStudents.sort((a, b) => {
                 switch (filterState.sortBy) {
                     case 'name':
@@ -1484,7 +1492,6 @@ function formatDateSafe(dateString) {
                 }
             });
 
-            // Atualizar contador
             const countElement = document.getElementById('studentsCount');
             if (countElement) {
                 countElement.textContent = `${filteredStudents.length} aluno${filteredStudents.length !== 1 ? 's' : ''}`;
@@ -1517,7 +1524,7 @@ function formatDateSafe(dateString) {
                 return;
             }
 
-            students.forEach((student, index) => {
+            students.forEach((student) => {
                 const card = document.createElement('div');
                 card.className = 'card-hover bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6 cursor-pointer';
                 
@@ -1549,7 +1556,7 @@ function formatDateSafe(dateString) {
                     </div>
                     <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">${displayName}</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Matrícula: ${displayMatricula}</p>
-                    ${student.birth_date ? `<p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Nascimento: ${formatDate(displayBirthDate)}</p>` : ''}
+                    ${student.birth_date ? `<p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Nascimento: ${formatDateSafe(displayBirthDate)}</p>` : ''}
                     ${student.cpf ? `<p class="text-sm text-gray-600 dark:text-gray-400">CPF: ${student.cpf}</p>` : ''}
                 `;
                 
@@ -1577,88 +1584,74 @@ function formatDateSafe(dateString) {
             applyStudentFilters();
         }
 
-        // Exportar dados dos alunos - VERSÃO MELHORADA
-async function exportStudentsData() {
-    try {
-        const students = await getStudents(currentState.class);
-        
-        // Obter informações da turma para o nome do arquivo
-        const classObj = dataCache.classes.find(c => c.id === currentState.class);
-        const yearObj = dataCache.years.find(y => y.id === currentState.year);
-        const shiftName = shiftsConfig[currentState.shift]?.name || currentState.shift;
-        
-        // Cabeçalho do CSV com separação adequada
-        let csvContent = "Nome Completo;Matrícula;CPF;Data de Nascimento;Quantidade de Documentos;Tipos de Documentos\n";
-        
-        for (const student of students) {
-            const docs = await getDocuments(student.id);
-            
-            // Formatar data de nascimento
-            const birthDate = student.birth_date ? formatDate(student.birth_date) : 'Não informado';
-            
-            // Formatar CPF
-            const cpf = student.cpf || 'Não informado';
-            
-            // Listar tipos de documentos
-            const docTypes = docs.map(doc => {
-                switch(doc.type) {
-                    case 'ata': return 'Ata de Resultados';
-                    case 'ficha': return 'Ficha Individual';
-                    case 'boletim': return 'Boletim Escolar';
-                    case 'historico': return 'Histórico Escolar';
-                    case 'declaracao': return 'Declaração';
-                    default: return doc.name;
+        // Exportar dados dos alunos
+        async function exportStudentsData() {
+            try {
+                const students = await getStudents(currentState.class);
+                
+                const classObj = dataCache.classes.find(c => c.id === currentState.class);
+                const yearObj = dataCache.years.find(y => y.id === currentState.year);
+                const shiftName = shiftsConfig[currentState.shift]?.name || currentState.shift;
+                
+                let csvContent = "Nome Completo;Matrícula;CPF;Data de Nascimento;Quantidade de Documentos;Tipos de Documentos\n";
+                
+                for (const student of students) {
+                    const docs = await getDocuments(student.id);
+                    
+                    const birthDate = student.birth_date ? formatDateSafe(student.birth_date) : 'Não informado';
+                    const cpf = student.cpf || 'Não informado';
+                    
+                    const docTypes = docs.map(doc => {
+                        switch(doc.type) {
+                            case 'ata': return 'Ata de Resultados';
+                            case 'ficha': return 'Ficha Individual';
+                            case 'boletim': return 'Boletim Escolar';
+                            case 'historico': return 'Histórico Escolar';
+                            case 'declaracao': return 'Declaração';
+                            default: return doc.name;
+                        }
+                    }).join(', ') || 'Nenhum documento';
+                    
+                    const escapeCsvField = (field) => {
+                        if (field.includes(';') || field.includes('"') || field.includes('\n')) {
+                            return '"' + field.replace(/"/g, '""') + '"';
+                        }
+                        return field;
+                    };
+                    
+                    csvContent += `${escapeCsvField(student.name)};${escapeCsvField(student.matricula)};${escapeCsvField(cpf)};${escapeCsvField(birthDate)};${docs.length};${escapeCsvField(docTypes)}\n`;
                 }
-            }).join(', ') || 'Nenhum documento';
-            
-            // Escapar aspas duplas nos dados e envolver campos com vírgula em aspas
-            const escapeCsvField = (field) => {
-                if (field.includes(';') || field.includes('"') || field.includes('\n')) {
-                    return '"' + field.replace(/"/g, '""') + '"';
-                }
-                return field;
-            };
-            
-            csvContent += `${escapeCsvField(student.name)};${escapeCsvField(student.matricula)};${escapeCsvField(cpf)};${escapeCsvField(birthDate)};${docs.length};${escapeCsvField(docTypes)}\n`;
+                
+                const header = `Relatório de Alunos\nEscola: ${schoolsConfig[currentState.school]?.name || 'Escola'}\nAno Letivo: ${yearObj?.year || 'N/A'}\nTurno: ${shiftName}\nTurma: ${classObj?.name || 'N/A'}\nData de Exportação: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}\nTotal de Alunos: ${students.length}\n\n`;
+                
+                const finalContent = header + csvContent;
+                
+                const BOM = '\uFEFF';
+                const blob = new Blob([BOM + finalContent], { type: 'text/csv;charset=utf-8;' });
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                
+                const fileName = `Alunos_${yearObj?.year || 'Ano'}_${shiftName}_${classObj?.name || 'Turma'}_${new Date().toISOString().split('T')[0]}.csv`;
+                link.download = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                URL.revokeObjectURL(link.href);
+                
+                showNotification(`Dados de ${students.length} aluno(s) exportados com sucesso!`);
+                
+                setTimeout(() => {
+                    showNotification('Dica: Abra o arquivo no Excel e use "Dados > Texto para Colunas" com separador ";" se necessário', 'info');
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Erro ao exportar dados:', error);
+                showNotification('Erro ao exportar dados: ' + error.message, 'error');
+            }
         }
-        
-        // Adicionar informações da turma no início do arquivo
-        const header = `Relatório de Alunos\nEscola: ${schoolsConfig[currentState.school]?.name || 'Escola'}\nAno Letivo: ${yearObj?.year || 'N/A'}\nTurno: ${shiftName}\nTurma: ${classObj?.name || 'N/A'}\nData de Exportação: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}\nTotal de Alunos: ${students.length}\n\n`;
-        
-        const finalContent = header + csvContent;
-        
-        // Criar blob com encoding UTF-8 com BOM para Excel reconhecer acentos
-        const BOM = '\uFEFF';
-        const blob = new Blob([BOM + finalContent], { type: 'text/csv;charset=utf-8;' });
-        
-        // Criar link para download
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        
-        // Nome do arquivo mais descritivo
-        const fileName = `Alunos_${yearObj?.year || 'Ano'}_${shiftName}_${classObj?.name || 'Turma'}_${new Date().toISOString().split('T')[0]}.csv`;
-        link.download = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
-        
-        // Fazer download
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        // Limpar URL do objeto
-        URL.revokeObjectURL(link.href);
-        
-        showNotification(`Dados de ${students.length} aluno(s) exportados com sucesso!`);
-        
-        // Exibir instruções para o usuário
-        setTimeout(() => {
-            showNotification('Dica: Abra o arquivo no Excel e use "Dados > Texto para Colunas" com separador ";" se necessário', 'info');
-        }, 2000);
-        
-    } catch (error) {
-        console.error('Erro ao exportar dados:', error);
-        showNotification('Erro ao exportar dados: ' + error.message, 'error');
-    }
-}
 
         // Sistema de modais
         function showModal(content) {
@@ -1939,7 +1932,7 @@ async function exportStudentsData() {
                 const studentCpf = document.getElementById('studentCpf').value;
                 const studentMatricula = document.getElementById('studentMatricula').value;
                 
-                const { data: existingStudents } = await supabase
+                const { data: existingStudents } = await supabaseClient
                     .from('students')
                     .select('matricula')
                     .eq('matricula', studentMatricula)
@@ -2216,7 +2209,7 @@ async function exportStudentsData() {
             }
         }
 
-        // Modais de remoção (mantidos igual)
+        // Modais de remoção
         async function openRemoveYearModal() {
             try {
                 const years = await getYears();
@@ -2601,7 +2594,7 @@ async function exportStudentsData() {
                                 <div class="flex-1">
                                     <span class="font-medium text-gray-900 dark:text-white">${docTypeName}</span>
                                     <div class="text-sm text-gray-500 dark:text-gray-400">
-                                        Data: ${formatDate(doc.date)}
+                                        Data: ${formatDateSafe(doc.date)}
                                     </div>
                                 </div>
                             </label>
@@ -2751,7 +2744,6 @@ async function exportStudentsData() {
             currentState = { school: null, year: null, shift: null, class: null, student: null };
             dataCache = { years: [], classes: [], students: [], documents: [], classDocuments: [] };
             
-            // Resetar interface para o padrão
             updateSchoolInterface('sagrada_familia');
             
             showNotification('Logout realizado com sucesso!', 'info');
@@ -2768,8 +2760,6 @@ async function exportStudentsData() {
             let iconContent = '';
             if (iconClass) {
                 iconContent = `<i class="${iconClass} text-white text-lg sm:text-xl"></i>`;
-            } else if (icon && icon.startsWith('http')) {
-                iconContent = `<img src="${icon}" alt="Ícone" class="w-full h-full object-cover rounded-xl">`;
             } else if (icon) {
                 iconContent = `<img src="${icon}" alt="Ícone" class="w-full h-full object-cover rounded-xl">`;
             }
@@ -2797,8 +2787,6 @@ async function exportStudentsData() {
                 const years = await getYears();
                 yearsList.innerHTML = '';
 
-                
-                // Inicializar pesquisa global
                 const globalSearchInput = document.getElementById('globalSearch');
                 if (globalSearchInput) {
                     let searchTimeout;
@@ -2847,7 +2835,7 @@ async function exportStudentsData() {
             }
         }
 
-        // Selecionar um Ano Letivo (agora vai para turnos)
+        // Selecionar um Ano Letivo
         async function selectYear(yearId, yearNumber) {
             currentState.year = yearId;
             currentState.shift = null;
@@ -2865,7 +2853,6 @@ async function exportStudentsData() {
                 const shiftsList = document.getElementById('shiftsList');
                 shiftsList.innerHTML = '<div class="col-span-full text-center py-8"><div class="loading mx-auto mb-4"></div><p class="text-gray-600 dark:text-gray-400">Carregando turnos...</p></div>';
                 
-                // Get all classes for this year and group by shift
                 const allClasses = await getClasses(currentState.year);
                 const shiftCounts = {};
                 
@@ -2878,7 +2865,6 @@ async function exportStudentsData() {
                 
                 shiftsList.innerHTML = '';
                 
-                // Create cards for each shift
                 Object.keys(shiftsConfig).forEach(shiftKey => {
                     const shift = shiftsConfig[shiftKey];
                     const classCount = shiftCounts[shiftKey] || 0;
@@ -2989,13 +2975,12 @@ async function exportStudentsData() {
                     classDocuments.forEach(doc => {
                         const card = createCard(
                             doc.name,
-                            `Adicionado em ${formatDate(doc.date)}`,
+                            `Adicionado em ${formatDateSafe(doc.date)}`,
                             'images/doc.png',
                             () => viewClassDocument(doc.id),
                             { iconBg: 'bg-purple-500' }
                         );
                         
-                        // Adicionar botão "Ver" no card
                         const viewBtn = document.createElement('button');
                         viewBtn.className = 'absolute top-2 right-2 bg-primary text-white p-2 rounded-lg hover:opacity-90 transition-opacity';
                         viewBtn.innerHTML = '<i class="fas fa-eye"></i>';
@@ -3060,7 +3045,6 @@ async function exportStudentsData() {
                     await applyStudentFilters();
                 }
                 
-                // Carregar documentos da turma quando carregar alunos
                 await loadClassDocuments();
                 showSection('studentsSection');
             } catch (error) {
@@ -3096,7 +3080,6 @@ async function exportStudentsData() {
                 
                 studentDocumentsList.innerHTML = '<div class="text-center py-4"><div class="loading mx-auto mb-2"></div><p class="text-gray-600 dark:text-gray-400 text-sm">Carregando...</p></div>';
                 
-                // Load student documents
                 const documents = await getDocuments(studentId);
                 studentDocumentsList.innerHTML = '';
                 
@@ -3133,7 +3116,7 @@ async function exportStudentsData() {
                                     </div>
                                     <div>
                                         <h4 class="text-sm font-medium text-gray-900 dark:text-white">${docTypeName}</h4>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">${formatDate(doc.date)}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">${formatDateSafe(doc.date)}</p>
                                     </div>
                                 </div>
                                 <button onclick="viewDocument('${doc.id}')" class="flex items-center px-3 py-1 text-xs font-medium text-white bg-primary rounded-lg hover:opacity-90 transition-opacity">
@@ -3153,20 +3136,89 @@ async function exportStudentsData() {
             }
         }
 
-        // Mostrar seção específica
+        // Visualizar documento
+        async function viewDocument(documentId) {
+            try {
+                const { data: document, error } = await supabaseClient
+                    .from('documents')
+                    .select('*')
+                    .eq('id', documentId)
+                    .single();
+
+                if (error) throw error;
+
+                if (document && document.path) {
+                    const newWindow = window.open();
+                    newWindow.document.write(`
+                        <html>
+                            <head>
+                                <title>${document.name}</title>
+                                <style>
+                                    body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0f0f0; }
+                                    img, iframe { max-width: 100%; max-height: 100vh; border: none; }
+                                </style>
+                            </head>
+                            <body>
+                                ${document.path.startsWith('data:image') ? 
+                                    `<img src="${document.path}" alt="${document.name}">` : 
+                                    `<iframe src="${document.path}" width="100%" height="100%"></iframe>`
+                                }
+                            </body>
+                        </html>
+                    `);
+                }
+            } catch (error) {
+                console.error('Erro ao visualizar documento:', error);
+                showNotification('Erro ao visualizar documento', 'error');
+            }
+        }
+
+        // Visualizar documento da turma
+        async function viewClassDocument(documentId) {
+            try {
+                const { data: document, error } = await supabaseClient
+                    .from('class_documents')
+                    .select('*')
+                    .eq('id', documentId)
+                    .single();
+
+                if (error) throw error;
+
+                if (document && document.path) {
+                    const newWindow = window.open();
+                    newWindow.document.write(`
+                        <html>
+                            <head>
+                                <title>${document.name}</title>
+                                <style>
+                                    body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0f0f0; }
+                                    img, iframe { max-width: 100%; max-height: 100vh; border: none; }
+                                </style>
+                            </head>
+                            <body>
+                                ${document.path.startsWith('data:image') ? 
+                                    `<img src="${document.path}" alt="${document.name}">` : 
+                                    `<iframe src="${document.path}" width="100%" height="100%"></iframe>`
+                                }
+                            </body>
+                        </html>
+                    `);
+                }
+            } catch (error) {
+                console.error('Erro ao visualizar documento da turma:', error);
+                showNotification('Erro ao visualizar documento da turma', 'error');
+            }
+        }
+
+        // Funções de navegação
         function showSection(sectionId) {
             const sections = ['yearsSection', 'shiftsSection', 'classesSection', 'studentsSection', 'documentsSection'];
             sections.forEach(id => {
-                const section = document.getElementById(id);
-                if (id === sectionId) {
-                    section.classList.remove('hidden');
-                } else {
-                    section.classList.add('hidden');
-                }
+                document.getElementById(id).classList.add('hidden');
             });
+            document.getElementById(sectionId).classList.remove('hidden');
         }
 
-        // Atualizar breadcrumb
         function updateBreadcrumb(...items) {
             const breadcrumb = document.getElementById('breadcrumb');
             breadcrumb.innerHTML = '';
@@ -3174,249 +3226,66 @@ async function exportStudentsData() {
             items.forEach((item, index) => {
                 const li = document.createElement('li');
                 
-                if (index < items.length - 1) {
-                    li.innerHTML = `
-                        <button onclick="navigateToBreadcrumb(${index})" 
-                            class="text-gray-600 dark:text-gray-400 hover:text-primary transition-colors duration-200 px-2 py-1 rounded-md hover:bg-primary/10 flex items-center text-sm">
-                            ${item}
-                        </button>
-                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                    `;
+                if (index === items.length - 1) {
+                    li.className = 'text-primary font-medium flex items-center whitespace-nowrap';
+                    li.innerHTML = item;
                 } else {
-                    li.innerHTML = `<span class="text-primary font-medium px-2 py-1 bg-primary/10 rounded-md flex items-center text-sm">${item}</span>`;
+                    li.className = 'flex items-center whitespace-nowrap';
+                    li.innerHTML = `${item} <span class="mx-2 text-gray-400">></span>`;
                 }
                 
                 breadcrumb.appendChild(li);
             });
         }
 
-        // Navegar pelo breadcrumb - OTIMIZADO
-        function navigateToBreadcrumb(level) {
-            // Navegação rápida sem await desnecessário
-            switch(level) {
-                case 0:
-                    // Resetar estados
-                    currentState.year = null;
-                    currentState.shift = null;
-                    currentState.class = null;
-                    currentState.student = null;
-                    loadYears();
-                    break;
-                case 1:
-                    // Voltar para turnos
-                    currentState.shift = null;
-                    currentState.class = null;
-                    currentState.student = null;
-                    const yearObj = dataCache.years.find(y => y.id === currentState.year);
-                    if (yearObj) {
-                        selectYear(currentState.year, yearObj.year);
-                    }
-                    break;
-                case 2:
-                    // Voltar para turmas
-                    currentState.class = null;
-                    currentState.student = null;
-                    const yearForShifts = document.getElementById('currentYearForShifts')?.textContent;
-                    if (currentState.shift && currentState.year && yearForShifts) {
-                        selectShift(currentState.shift, currentState.year, yearForShifts);
-                    }
-                    break;
-                case 3:
-                    // Voltar para alunos
-                    currentState.student = null;
-                    const classObj = dataCache.classes.find(c => c.id === currentState.class);
-                    if (classObj && currentState.shift) {
-                        selectClass(currentState.class, classObj.name, currentState.shift);
-                    }
-                    break;
-            }
-        }
+        // Inicializar eventos de navegação
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePasswordToggle();
+            initializeSystem();
+        });
 
-        // Botões de voltar otimizados
-        document.getElementById('backToYears').addEventListener('click', () => {
+        // Event listeners para botões de voltar
+        document.getElementById('backToYears').addEventListener('click', async function() {
             currentState.year = null;
             currentState.shift = null;
             currentState.class = null;
             currentState.student = null;
-            loadYears();
+            await loadYears();
+            updateBreadcrumb('<img src="images/anos.png" alt="Anos" class="w-5 h-5 mr-2 rounded inline"> Anos Letivos');
         });
-        
-        document.getElementById('backToShifts').addEventListener('click', () => {
-            currentState.shift = null;
+
+        document.getElementById('backToShifts').addEventListener('click', async function() {
             currentState.class = null;
             currentState.student = null;
             const yearObj = dataCache.years.find(y => y.id === currentState.year);
-            if (yearObj) {
-                selectYear(currentState.year, yearObj.year);
-            }
+            document.getElementById('currentYearForShifts').textContent = yearObj?.year || '';
+            await loadShifts();
+            updateBreadcrumb(
+                '<img src="images/anos.png" alt="Anos" class="w-5 h-5 mr-2 rounded inline"> Anos Letivos',
+                yearObj?.year || ''
+            );
         });
-        
-        document.getElementById('backToClasses').addEventListener('click', () => {
-            currentState.class = null;
+
+        document.getElementById('backToClasses').addEventListener('click', async function() {
             currentState.student = null;
-            const yearForClasses = document.getElementById('currentYear')?.textContent;
-            if (currentState.shift && currentState.year && yearForClasses) {
-                selectShift(currentState.shift, currentState.year, yearForClasses);
-            }
+            const yearObj = dataCache.years.find(y => y.id === currentState.year);
+            const shiftName = shiftsConfig[currentState.shift]?.name || currentState.shift;
+            document.getElementById('currentShiftName').textContent = shiftName;
+            document.getElementById('currentYear').textContent = yearObj?.year || '';
+            await loadClasses(currentState.year, currentState.shift);
+            updateBreadcrumb(
+                '<img src="images/anos.png" alt="Anos" class="w-5 h-5 mr-2 rounded inline"> Anos Letivos', 
+                yearObj?.year || '',
+                '<img src="images/turnos.png" alt="Turnos" class="w-5 h-5 mr-2 rounded inline"> Turnos',
+                shiftName
+            );
         });
-        
-        document.getElementById('backToStudents').addEventListener('click', () => {
+
+        document.getElementById('backToStudents').addEventListener('click', async function() {
             currentState.student = null;
             const classObj = dataCache.classes.find(c => c.id === currentState.class);
-            if (classObj && currentState.shift) {
-                selectClass(currentState.class, classObj.name, currentState.shift);
-            }
-        });
-
-        // Visualizar documento
-        async function viewDocument(docId) {
-            try {
-                const numericDocId = parseInt(docId);
-                const document = dataCache.documents.find(d => d.id == numericDocId);
-                if (!document) {
-                    showNotification('Documento não encontrado', 'error');
-                    return;
-                }
-                
-                let docTypeName = '';
-                switch(document.type) {
-                    case 'ata': docTypeName = 'Ata de Resultados Finais'; break;
-                    case 'ficha': docTypeName = 'Ficha Individual de Rendimento'; break;
-                    case 'boletim': docTypeName = 'Boletim Escolar'; break;
-                    case 'historico': docTypeName = 'Histórico Escolar'; break;
-                    case 'declaracao': docTypeName = 'Declaração'; break;
-                    default: docTypeName = document.name;
-                }
-                
-                let previewContent = '';
-                if (document.path.startsWith('data:application/pdf')) {
-                    previewContent = `<iframe src="${document.path}" class="w-full h-96 rounded-xl border-0"></iframe>`;
-                } else {
-                    previewContent = `<img src="${document.path}" class="max-w-full h-auto rounded-xl shadow-lg">`;
-                }
-                
-                const content = `
-                    <div class="p-6 sm:p-8 max-w-2xl">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                                <img src="images/doc.png" alt="Documentos" class="w-5 sm:w-6 h-5 sm:h-6 mr-3 rounded">
-                                ${docTypeName}
-                            </h3>
-                            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-                                <i class="fas fa-times text-xl"></i>
-                            </button>
-                        </div>
-                        <div class="mb-6 text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                            ${previewContent}
-                        </div>
-                        <div class="text-center mb-6">
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Data de upload: ${formatDate(document.date)}</p>
-                        </div>
-                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-                            <button onclick="closeModal()" 
-                                class="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
-                                Fechar
-                            </button>
-                            <a href="${document.path}" download="${docTypeName} - ${formatDate(document.date)}.${document.path.includes('pdf') ? 'pdf' : 'png'}"
-                                class="flex-1 px-6 py-3 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 text-center shadow-lg">
-                                <i class="fas fa-download mr-2"></i>
-                                Download
-                            </a>
-                        </div>
-                    </div>
-                `;
-                
-                showModal(content);
-            } catch (error) {
-                console.error('Erro ao visualizar documento:', error);
-                showNotification('Erro ao carregar documento', 'error');
-            }
-        }
-
-        // Visualizar documento da turma
-        async function viewClassDocument(docId) {
-            try {
-                const numericDocId = parseInt(docId);
-                const document = dataCache.classDocuments.find(d => d.id == numericDocId);
-                if (!document) {
-                    showNotification('Documento não encontrado', 'error');
-                    return;
-                }
-                
-                let previewContent = '';
-                if (document.path.startsWith('data:application/pdf')) {
-                    previewContent = `<iframe src="${document.path}" class="w-full h-96 rounded-xl border-0"></iframe>`;
-                } else {
-                    previewContent = `<img src="${document.path}" class="max-w-full h-auto rounded-xl shadow-lg">`;
-                }
-                
-                const content = `
-                    <div class="p-6 sm:p-8 max-w-2xl">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                                <img src="images/turmas.png" alt="Turma" class="w-5 sm:w-6 h-5 sm:h-6 mr-3 rounded">
-                                ${document.name}
-                            </h3>
-                            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-                                <i class="fas fa-times text-xl"></i>
-                            </button>
-                        </div>
-                        <div class="mb-6 text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                            ${previewContent}
-                        </div>
-                        <div class="text-center mb-6">
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Data de upload: ${formatDate(document.date)}</p>
-                        </div>
-                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-                            <button onclick="closeModal()" 
-                                class="flex-1 px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
-                                Fechar
-                            </button>
-                            <a href="${document.path}" download="${document.name} - ${formatDate(document.date)}.${document.path.includes('pdf') ? 'pdf' : 'png'}"
-                                class="flex-1 px-6 py-3 text-sm font-medium text-white gradient-bg rounded-xl hover:opacity-90 transition-all duration-200 text-center shadow-lg">
-                                <i class="fas fa-download mr-2"></i>
-                                Download
-                            </a>
-                        </div>
-                    </div>
-                `;
-                
-                showModal(content);
-            } catch (error) {
-                console.error('Erro ao visualizar documento da turma:', error);
-                showNotification('Erro ao carregar documento', 'error');
-            }
-        }
-
-        // Função auxiliar para formatar data
-function formatDate(dateString) {
-    if (!dateString) return '';
-    
-    try {
-        // Se está no formato ISO (YYYY-MM-DD), tratar como data local
-        if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-            const parts = dateString.split('-');
-            const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-            return date.toLocaleDateString('pt-BR');
-        }
-        
-        // Tentar como Data normal
-        const date = new Date(dateString);
-        return date.toLocaleDateString('pt-BR');
-    } catch (error) {
-        return dateString;
-    }
-}
-
-        // Inicializar o sistema
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM carregado, inicializando sistema...');
-            initializeSystem();
-            
-            // Inicializar toggle da senha quando mostrar a tela de login
-            setTimeout(() => {
-                initializePasswordToggle();
-            }, 1000);
+            document.getElementById('currentClass').textContent = classObj?.name || '';
+            await loadStudents(currentState.class);
         });
     </script>
 </body>
