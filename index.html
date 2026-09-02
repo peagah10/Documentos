@@ -660,6 +660,18 @@
             // Inicializar usuários padrão se não existirem
             let users = LocalDB.getUsers();
             if (users.length === 0) {
+                // Usuário admin global (acesso a todas as escolas)
+                users.push({
+                    id: LocalDB.generateId(),
+                    username: 'admin',
+                    password: 'admin123',
+                    school_id: 'all', // acesso global
+                    role: 'admin',
+                    name: 'Administrador Geral',
+                    is_global: true
+                });
+                
+                // Também criar um admin por escola para compatibilidade
                 const schools = ['sagrada_familia', 'manoel_serafim', 'joao_lemos', 'jose_rodrigues'];
                 schools.forEach(school => {
                     users.push({
@@ -668,7 +680,7 @@
                         password: 'admin123',
                         school_id: school,
                         role: 'admin',
-                        name: 'Administrador'
+                        name: 'Administrador ' + school
                     });
                 });
                 LocalDB.setData('school_users', users);
@@ -860,7 +872,7 @@
                 const user = users.find(u => 
                     u.username === username && 
                     u.password === password && 
-                    u.school_id === schoolId
+                    (u.school_id === schoolId || u.school_id === 'all' || u.is_global)
                 );
                 
                 return user || null;
